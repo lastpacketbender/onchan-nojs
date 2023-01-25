@@ -13,9 +13,6 @@
                 %if quote and quote.img.url and quote.img.orig_filename:
                 %from util import convert_unit
                 %include(ctx.file_info)
-                <a target="_blank" class="btn" href="/{{thread.id}}.txt" download="{{f'{thread.id}'}}.txt">
-                    &nbsp;<i class="fa fa-file"></i>&nbsp;
-                </a>
                 %end
                 <!-- 
                     This handles quotes only, will make an effort to combine implementation for thread.

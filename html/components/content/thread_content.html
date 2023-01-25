@@ -8,7 +8,6 @@
     <div id="{{ctx.thread.id}}-content">
         %include(ctx.content_info)
     </div>
-    <br/>
     <blockquote class="newlines" style="word-break: break-all;">
     %for line in re.split("\r?\n", ctx.thread.comment):
         %include(ctx.comment_line)
