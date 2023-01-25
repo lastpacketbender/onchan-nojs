@@ -1,0 +1,43 @@
+<!-- Used in thread.html, comment.html, board.html-->
+%import string, re
+%if '>' not in line:
+    {{line}}
+%elif re.match(r"^>[^>]*$", line):
+    <span class="greentext">{{line}}</span>
+%else:
+    %boards = [m.start() for m in re.finditer(r">>>/[a-z]{1,3}/", line)] + [m.end() for m in re.finditer(r">>>/[a-z]{1,3}/", line)]
+    %replies = [m.start() for m in re.finditer(r">>[0-9]+", line)] + [m.end() for m in re.finditer(r">>[0-9]+", line)]
+    %locations = set([0, len(line)])
+
+    %if boards:
+        %locations.update([start for start in [x for x in boards]])
+    %end
+    %if replies:
+        %locations.update(start for start in [x for x in replies])
+    %end
+
+    %locations = list(sorted(locations))
+    %segments = [line[i:j] for i,j in zip(locations, locations[1:]+[None])]
+    %greentext = False
+    %for i, segment in enumerate(segments):
+        %if segment[:3] == '>>>':
+            <a href="{{segment.replace('>', '')}}">{{segment}}</a>
+        %elif segment[:2] == '>>':
+            %if ctx.thread:
+            <a href="{{ctx.board.path}}thread/{{ctx.thread.id}}">{{segment}}</a>
+            %else:
+            <a href="{{ctx.board.path}}thread/{{thread.id}}">{{segment}}</a>
+            %end
+        %elif i == 0 and segment[0] == '>':
+            <span class="greentext">{{segment}}</span>
+            %greentext = True
+        %else:
+            %if not greentext:
+                {{segment}}
+            %else:
+                <span class="greentext">{{segment}}</span>
+            %end
+        %end
+    %end
+%end
+<br/>

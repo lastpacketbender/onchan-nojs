@@ -1,0 +1,15 @@
+>greentext
+>grentext with broken text
+>>1 link to another post
+>>1 >>2 multiple links to another post
+>>>/x/ board links
+
+should >not greentext
+should all link >>1 >>2 >>3 >>4 >>5
+should all link >>>/x/ >>>/b/
+should all link >>1 >>>/x/
+should all link >>1 >>>/x/ >not greentext 
+
+>>1 >not greentext >>2 >>3 >>4 >>5 >>>/x/ >>>/b/
+
+>greentext with >>>/x/ links >>3

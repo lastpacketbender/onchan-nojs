@@ -1,0 +1,38 @@
+%include(ctx.upload)
+<div id="threads" align="center" style="display: inline-block;">
+	%if ctx.board:
+		%for thread in ctx.board.threads:
+		<div id="{{thread.id}}" class="catalog-thread">
+			<div id="{{thread.id}}-content" style="text-align: center;">
+				<a href="{{thread.board}}thread/{{thread.id}}">
+					<img style="max-width: 100%; max-height: 100%; float:none" src="/{{thread.img.url}}" class="thread-img"/>
+				</a>
+				<br/>
+				<small>
+					R&nbsp;<strong>{{thread.replies}}</strong>&nbsp;/&nbsp;I&nbsp;<strong>{{thread.image_replies}}</strong>
+				</small>
+				<br/>
+				<small>
+					%if thread.subject:
+					<strong>{{thread.subject}}</strong>
+					%end
+					<blockquote class="newlines" style="text-align:center; word-wrap: break-word; margin-top: 5px; text-align:center; overflow: hidden; text-overflow: ellipsis;">
+						%for line in thread.comment.split("\n"):
+							%for token in line.split(" "):
+								%include(ctx.comment_line)
+							%end
+						%end
+					</blockquote>
+				</small>
+			</div>
+        </div>
+		%end
+	%end
+</div>
+<hr class="solid">
+<!-- TODO: Give ID and assign style in css -->
+<div style="text-align: left">
+	[<a href="{{ctx.board.path}}">Index</a>]
+	[<a href="#top">Top</a>]
+</div>
+<hr class="solid">

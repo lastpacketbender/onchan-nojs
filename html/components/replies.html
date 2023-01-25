@@ -1,0 +1,62 @@
+%if not ctx.thread:
+    %for quote in thread.quotes:
+    <div id="{{thread.id}}-{{quote.id}}" style="display: flex; margin: 10px;">
+        &gt;&gt;&nbsp;
+        <div id="p{{quote.id}}" style="background-color: #f0e0d6; padding: 10px;" >
+            %if quote and quote.img and quote.img.url:
+            <a target="_blank" href="/{{quote.img.url}}">
+                <img src="/{{quote.img.url}}" class="thread-img"/>
+            </a>
+            %end
+            <div id="{{quote.id}}-content" style="text-align: justify;">
+                %include(ctx.content_info)
+                %if quote and quote.img.url and quote.img.orig_filename:
+                %from util import convert_unit
+                %include(ctx.file_info)
+                <a target="_blank" class="btn" href="/{{thread.id}}.txt" download="{{f'{thread.id}'}}.txt">
+                    &nbsp;<i class="fa fa-file"></i>&nbsp;
+                </a>
+                %end
+                <!-- 
+                    This handles quotes only, will make an effort to combine implementation for thread.
+                    For now, make sure you update comment.html and catalog too
+                -->
+                <blockquote class="newlines" style="word-break: break-word;">
+                %for line in re.split("\r?\n", quote.comment):
+                    %include(ctx.comment_line)
+                %end
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    %end
+%else:
+    %import re
+    %for quote in ctx.thread.quotes:
+    <div id="{{ctx.thread.id}}-{{quote.id}}" style="display: flex; margin: 10px;">
+        &gt;&gt;&nbsp;
+        <div id="p{{quote.id}}" style="background-color: #f0e0d6; padding: 10px;" >
+            %if quote and quote.img and quote.img.url:
+            <a target="_blank" href="/{{quote.img.url}}">
+                <img src="/{{quote.img.url}}" class="thread-img"/>
+            </a>
+            %end
+            <div id="{{quote.id}}-content" style="text-align: justify;">
+                %include(ctx.content_info)
+                %if quote and quote.img.url and quote.img.orig_filename:
+                    %include(ctx.file_info)
+                %end
+                <!-- 
+                    This handles quotes only, will make an effort to combine implementation for thread.
+                    For now, make sure you update comment.html and catalog too
+                -->
+                <blockquote class="newlines" style="word-break: break-word;">
+                %for line in re.split("\r?\n", quote.comment):
+                    %include(ctx.comment_line)
+                %end
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    %end
+%end

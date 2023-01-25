@@ -1,0 +1,279 @@
+html {
+	box-sizing: border-box;
+	font-size: 16px;
+	font-family: monospace;
+	background-color: #ffffee;
+}
+
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+	margin: 0;
+	padding: 0;
+	font-weight: normal;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+footer, #heading {
+	text-align: center;
+}
+
+a {
+	color: #800000;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+	text-decoration-color: rgba(128, 0, 0, 0.4);
+};
+
+strong {
+	font-weight: bold;
+}
+
+strong p, h1, h2, h3, h4, h5, h6 {
+	font-weight: bold;
+}
+
+.horizontal-links {
+	display: inline-block;
+	margin: 0 auto;
+	padding: 0;
+}
+
+.horizontal-links li {
+	display: inline;
+}
+
+/* Add a black background color to the top navigation */
+.navbar {
+	background-color: #ffffee;
+	overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.navbar a {
+	float: left;
+	color: #000;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.navbar a:hover {
+	background-color: rgb(255, 205, 210);
+	color: black;
+}
+
+/* Add a color to the active/current link */
+.navbar a.active {
+	background-color: #800000;
+	color: #fff;
+}
+
+.content {
+	padding: 10px;
+}
+
+div.container {
+	align-items: center;
+}
+
+#main {
+	padding: 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+@media (max-width: 800px) {
+	#main {
+		max-width: 100%;
+	}
+}
+
+@media (min-width: 1024px) {
+	#main {
+		max-width: 1024px;
+	}
+}
+
+/********************** UPLOAD ********************/
+#upload-form {
+	display: grid;
+	grid-template-columns: 400 1fr;
+	overflow: hidden;
+
+}
+
+#upload-form label {
+	float: left;
+	width: 200px;
+	padding-right: 24px;
+}
+
+#upload-form input {
+	float: left;
+	width: calc(100% - 200px); /* TODO: Mediaquery this */
+}
+
+#upload-form button {
+	float: right;
+	font-family: monospace;
+}
+
+button {
+	font-family: monospace;
+}
+
+input {
+	font-family: monospace;
+}
+/********************** UPLOAD ********************/
+
+.thread-img {
+	max-width: 250px;
+	max-height: 250px;
+	position: block;
+	float: left; 
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.thread-body p, blockquote, h1, h2, h3, h4, h5, h6 {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+/* Dividers */
+hr.solid {
+	border-top: 1px solid #bbb;
+	width: 100%;
+}
+
+#board-header{
+	text-align: center;
+}
+
+#threads {
+	display: grid;
+}
+
+ul .horizontal-links {
+	display: block;
+}
+
+th {
+	text-align: left;
+}
+
+td {
+	display: flex;
+	width: 100%;
+}
+
+table {
+	table-layout: fixed;
+}
+
+button {
+	margin-left: 4px;
+}
+
+input {
+	width: 100%;
+}
+
+/* >be greentext */
+.greentext {
+	color:#789922;
+}
+
+/* Name in thread/reply */
+.name {
+	color: #117743
+}
+
+/* Thread div */
+.thread {
+	padding: 10px;
+}
+
+.board-img {
+	display:flex;
+	text-overflow: ellipsis; 
+	overflow:hidden;
+}
+
+.newlines {
+	text-align: justify;
+	margin-left: 0px;
+	overflow: inherit;
+}
+
+.input-delete {
+	width: auto;
+}
+
+.thread-checkbox-meta {
+	display: flex;
+}
+
+.ellipse-text  {
+	/* Standard CSS ellipsis */
+    white-space: nowrap;                   
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    width: 376px;
+    /* Beginning of string */
+    direction: rtl;
+    text-align: left;
+
+	position: relative;
+	/* white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden; */
+}
+#ellipse-text:after {
+	content: attr(data-filetype);
+	position: absolute;
+	left: 100%;
+	top: 0;
+}
+
+#ellipse-text:hover {
+	width: auto
+}
+
+#ellipse-text:hover:after {
+	display: none;
+}
+
+.reply {
+	background-color: #f0e0d6; 
+	padding: 10px; 
+	word-wrap: break-word;
+}
+
+.catalog-thread {
+	vertical-align:top; 
+	display: inline-block; 
+	white-space: normal;
+	padding: 10px; 
+	width: 180px; 
+	max-height: 320px; 
+	overflow: hidden; 
+	text-overflow: ellipsis;
+}

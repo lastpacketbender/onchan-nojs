@@ -1,0 +1,22 @@
+<div align="center">
+	<div id="heading">
+		<strong><h1>{{ctx.config['branding']}}</h1></strong>
+	</div>
+
+	<div>
+		<h2>What is {{ctx.config['branding']}}?</h2>
+		<p>{{ctx.config['info']['home']['what']}}</p>
+	</div>
+	<div>
+		<h2>Boards</h2>
+		<ul>
+			%for board in ctx.boards:
+			<li>
+				<a href="{{board.path}}">
+					{{board.name}}
+				</a>
+			</li>
+			%end
+		</ul>
+	</div>
+</div>

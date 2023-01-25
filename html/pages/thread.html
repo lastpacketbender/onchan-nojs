@@ -1,0 +1,17 @@
+%include(ctx.upload)
+<div id="thread">
+	%if ctx.thread:
+		<div id="p{{ctx.thread.id}}" style="padding: 10px;">
+			%include(ctx.thread_content)
+			%include(ctx.replies)
+			<!-- %include(conversation) -->
+        </div>
+	%end
+</div>
+
+<hr class="solid"/>
+<!-- TODO: Give ID and assign style in css -->
+<div style="text-align: left">
+	[<a href="#top">Top</a>]
+</div>
+<hr class="solid">

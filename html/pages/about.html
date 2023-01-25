@@ -1,0 +1,13 @@
+<div align="center">
+    <div id="main">
+        <h1>About</h1>
+        <div>
+            <blockquote class="newlines">
+                %import re
+                %for line in re.split("\r?\n", ctx.config['info']['about']):
+                    %include(ctx.comment_line)
+                %end
+            </blockquote>
+        </div>
+    </div>
+</div>

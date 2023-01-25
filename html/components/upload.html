@@ -1,0 +1,66 @@
+<div id="board-header">
+    <div id="main">
+        %if ctx.board:
+        <h1 style="color: rgb(128, 0, 0)">{{ctx.board.path}} - {{ctx.board.name}}</h1>
+        <p style="color: rgb(128, 0, 0)">{{ctx.board.description}}</p>
+        
+        <div id="upload">
+            %if not ctx.thread:
+            <form action="{{ctx.board.path}}upload" method="post" id="upload-form" name="upload-form" enctype="multipart/form-data">
+            %else:
+            <form action="{{ctx.board.path}}thread/{{ctx.thread.id}}/upload" method="post" id="upload-form" name="upload-form" enctype="multipart/form-data">
+            %end
+
+                <table align="center">
+                    <tr>
+                        <th><label for="name">Name</label></th>
+                        <td><input style="width: 100%;" type="text" id="name" name="name" value="Anonymous"></td>
+                    </tr>
+                    %if not ctx.thread:
+                    <tr>
+                        <th><label for="subject">Subject</label></th>
+                        <td><input style="width: 100%;" type="text" id="subject" name="subject"></td>
+                    </tr>
+                    %end
+                    <tr>
+                        <th><label for="options">Options</label></th>
+                        <td>
+                            <input style="width: 100%;" type="text" id="options" name="options">
+                            <button type="submit">Post</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="comment">Comment</label></th>
+                        <td><textarea required maxlength="2000" cols="30" rows="4" name="comment" id="comment" style="width: 100%"></textarea></td>
+                    </tr>
+                    <tr>
+                        <th><label for="file-upload">File</label></th>
+                        %if not ctx.thread:
+                        <td><input type="file" id="file" name="file" required style="width: 100%"></td>
+                        %else:
+                        <td><input type="file" id="file" name="file" style="width: 100%"></td>
+                        %end
+                    </tr>
+                </table>
+                <p>Please read the <a href="/rules">Rules</a> and <a href="/faq">FAQ</a> before posting</p>
+            </form>
+        </div>
+        %end
+    </div>
+	<hr class="solid">
+	<div style="text-align: left">
+        %if ctx.board:
+            %if ctx.thread:
+            [<a href="{{ctx.board.path}}">Return</a>]
+            %end
+        <!--TODO: Return to Index from Catalog-->
+            %if not ctx.catalog:
+		        [<a href="{{ctx.board.path}}catalog">Catalog</a>]
+            %else:
+                [<a href="{{ctx.board.path}}">Index</a>]
+            %end
+		[<a href="#bottom">Bottom</a>]
+        %end
+	</div>
+	<hr class="solid">
+</div>

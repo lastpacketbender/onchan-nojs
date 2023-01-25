@@ -1,0 +1,29 @@
+<!-- INFO: Any changes need to be mirrored to replies where thread = quote/reply -->
+%import re
+%include(ctx.file_info)
+%if ctx.thread:
+    <a target="_blank" href="/{{ctx.thread.img.url}}">
+        <img src="/{{ctx.thread.img.url}}" class="thread-img"/>
+    </a>
+    <div id="{{ctx.thread.id}}-content">
+        %include(ctx.content_info)
+    </div>
+    <br/>
+    <blockquote class="newlines" style="word-break: break-all;">
+    %for line in re.split("\r?\n", ctx.thread.comment):
+        %include(ctx.comment_line)
+    %end
+    </blockquote>
+%else:
+    <a target="_blank" href="/{{thread.img.url}}">
+        <img src="/{{thread.img.url}}" class="thread-img"/>
+    </a>
+    <div id="{{thread.id}}-content">
+        %include(ctx.content_info)
+    </div>
+    <blockquote class="newlines" style="word-break: break-all;">
+        %for line in re.split("\r?\n", thread.comment):
+            %include(ctx.comment_line)
+        %end
+    </blockquote>
+%end

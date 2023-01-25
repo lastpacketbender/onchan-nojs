@@ -1,0 +1,29 @@
+%include(ctx.upload)
+<div id="board">
+	%if ctx.board:
+		%import re
+		%from util import convert_unit
+        %if not ctx.thread:
+			%for i, thread in enumerate(ctx.board.threads):
+			<div id="p{{thread.id}}" class="thread">
+				%include(ctx.thread_content)
+				%if thread.replies - len(thread.quotes) > 0 or thread.image_replies - len([x.id for x in thread.quotes if x.img.url]) > 0:
+				<small style="color:grey">
+					{{thread.replies - len(thread.quotes)}} replies and {{thread.image_replies - len([x.id for x in thread.quotes if x.img.url])}} images omitted. Click <a href="{{ctx.board.path}}thread/{{thread.id}}#p{{thread.id}}">here</a> to view.
+				</small>
+				%end
+				%include(ctx.replies)
+			</div>
+			%if i != len(ctx.board.threads) - 1:
+			<hr class="solid"/>
+			%end
+			%end
+		%end
+	%end
+</div>
+<hr class="solid">
+<!-- TODO: Give ID and assign style in css -->
+<div style="text-align: left">
+	[<a href="#top">Top</a>]
+</div>
+<hr class="solid">

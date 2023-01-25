@@ -1,0 +1,96 @@
+CLEAN UP
+    - Remove unused CSS/style
+    - HTML/CSS validation
+    - PEP style
+    - SQL format
+
+DOCUMENTATION
+    - Other error pages
+    - FAQ
+    - Rules
+    - Post deletion after X amount of time
+
+SECURITY
+    DATA
+        - SQL security (users, roles, etc.)
+        - ACID transactions
+        - Finish validations for all user input
+    FRONTEND
+        - HTML security
+    Backend
+        - Validations
+        - Checks for abuse
+    Bans
+        - Capcodes and tripcodes prevent from future posting
+            - message to user who uses in future
+            - block
+            - alerting system for admin
+
+DATA
+    - Saging
+    - Bump limit
+
+COSMETIC FIXES
+    - Ellipsis on file name/others in post
+    - Mobile responsiveness (reorganize responses to more vertical
+    - Fix bottom and right padding of quotes
+
+RESEARCH
+    - Handle pages with trigger or use math
+
+BUG FIXES
+    - strip submission
+    - render comment as is (iterate char by char, split between matches, iterate over splits with wraps)
+
+FEATURES
+    - Add (Dead) for IDs no longer existing
+    - GETs (MGET = Million)
+        - Sticky GETs
+        - FAILGETs WINGETs
+        - /4get/ (to obtain 4chan gets)
+    - DB
+        - Backend for popping off/removing posts as boards exceed threshold (triggers or part of app?)
+        - Bump limit
+        - Pagination
+        - Delete  
+        - SQL meta tables and stats
+        - Indexes
+        - Reporting
+    - Password cookie after posting for ids
+    - Options
+        - sage (don't bump thread)
+        - nonoko (use old posting functionality)
+        - nonoko + sage
+        - Trip codes
+        - Secure trip codes
+        - Capcodes (only admins)
+    - Captcha
+    - Rate limiting
+    - Observability
+    - Admin functionality
+        - Sticky
+        - Lock
+
+CONFIGURATION
+    - Boards (path, description, name, special rules)
+        - path
+        - description
+        - name
+        - posting functionality (nonoko by default)
+        - num posts
+        - num pages
+        - special rules
+        - bump limit
+    - Pages (legal, about, contact, feedback, rules, faq, with ability to disable any)
+
+NICE TO HAVES
+    - Save LATEST version for crypto
+    - Incentivize breakage (pop all posts, injections, getting dubs, trips, etc.)
+    - JS Additions
+    - localstack for S3 replacement of public folder or CDN
+    - SQL for other non SQLite databases (for sharding)
+    - test data insertion
+    - Image DNA
+    - Check for steganography
+    - Watch words
+    - Verify image headers

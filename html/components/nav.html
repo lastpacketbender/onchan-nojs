@@ -1,0 +1,11 @@
+<nav id="top">
+    <div class="navbar">
+        %for b in ctx.boards:
+            %if ctx.board and b.path == ctx.board.path:
+                <a class="active" href="{{b.path}}">{{b.path}}</a>
+            %else:
+                <a href="{{b.path}}">{{b.path}}</a>
+            %end
+        %end
+    </div>
+</nav>

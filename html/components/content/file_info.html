@@ -1,0 +1,59 @@
+%import os
+%from util import convert_unit
+%if 'quote' in vars():
+<div id="quote-{{quote.id}}-checkbox-meta" class="thread-checkbox-meta" style="display: inline-block">
+    <div id="{{quote.id}}-img" style="text-overflow: ellipsis; overflow: hidden; display: inline-block;">
+        <p>
+            <small>
+                File:&nbsp;<a style="width:100%" target="_blank" href="/{{quote.img.url}}">
+                    %ext = os.path.splitext(ctx.thread.img.orig_filename[-10:])[1] if ctx.thread else os.path.splitext(thread.img.orig_filename[-10:])[1]
+                    {{f"{quote.img.orig_filename[:25]}(...){ext}" if len(quote.img.orig_filename) > 25 + len(ext) else quote.img.orig_filename}}
+                </a>
+            </small>
+                
+            <a target="_blank" class="btn" href="/{{quote.img.url}}" download="{{quote.img.orig_filename}}">
+                &nbsp;<i class="fa fa-download"></i>&nbsp;
+            </a>
+        </p>
+        <p>
+            <small>({{convert_unit(quote.img.size)}}, {{quote.img.height}}x{{quote.img.width}})</small>
+        </p>
+    </div>
+</div>
+%elif ctx.thread:
+<div id="thread-{{ctx.thread.id}}-checkbox-meta" class="thread-checkbox-meta" style="display: inline-block">
+    <div id="{{ctx.thread.id}}-img" style="text-overflow: ellipsis; overflow: hidden;  display: inline-block;">
+        <p>
+            <small>
+                File:&nbsp;<a style="width:100%" target="_blank" href="/{{ctx.thread.img.url}}">
+                    %ext = os.path.splitext(ctx.thread.img.orig_filename[-10:])[1]
+                    {{f"{ctx.thread.img.orig_filename[:25]}(...){ext}" if len(ctx.thread.img.orig_filename) > 25 + len(ext) else ctx.thread.img.orig_filename}}
+                </a>
+            </small>
+                
+            <a target="_blank" class="btn" href="/{{ctx.thread.img.url}}" download="{{ctx.thread.img.orig_filename}}">
+                &nbsp;<i class="fa fa-download"></i>&nbsp;
+            </a>
+            <small>({{convert_unit(ctx.thread.img.size)}}, {{ctx.thread.img.height}}x{{ctx.thread.img.width}})</small>
+        </p>
+    </div>
+</div>
+%else:
+<div id="thread-{{thread.id}}-checkbox-meta" class="thread-checkbox-meta" style="display: inline-block">
+    <div id="{{thread.id}}-img" style="text-overflow: ellipsis; overflow: hidden; display: inline-block;">
+        <p>
+            <small>
+                File:&nbsp;<a style="width:100%" target="_blank" href="/{{thread.img.url}}">
+                    %ext = os.path.splitext(thread.img.orig_filename[-10:])[1]
+                    {{f"{thread.img.orig_filename[:25]}(...){ext}" if len(thread.img.orig_filename) > 25 + len(ext) else thread.img.orig_filename}}
+                </a>
+            </small>
+                
+            <a target="_blank" class="btn" href="/{{thread.img.url}}" download="{{thread.img.orig_filename}}">
+                &nbsp;<i class="fa fa-download"></i>&nbsp;
+            </a>
+            <small>({{convert_unit(thread.img.size)}}, {{thread.img.height}}x{{thread.img.width}})</small>
+        </p>
+    </div>
+</div>
+%end
