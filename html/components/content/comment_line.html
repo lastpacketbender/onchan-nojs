@@ -27,13 +27,7 @@
     %for i, segment in enumerate(segments):
         %if segment in emotes:
             %replaced = segment.replace(':', '')
-            %if replaced == 'k':
-                <img src="/public/emote/k.png" width="37" height="30">
-            %elif replaced == 'o':
-                <img src="/public/emote/o.png" width="37" height="30">
-            %elif replaced == 't':
-                <img src="/public/emote/t.png" width="37" height="30">
-            %end
+            <img src="/public/emote/{{replaced}}.png" width="37" height="30">
         %elif segment[:3] == '>>>' and segment[-1] == '/':
             <a href="{{segment.replace('>', '')}}">{{segment}}</a>
         %elif segment[:2] == '>>' and segment[-1].isdigit():

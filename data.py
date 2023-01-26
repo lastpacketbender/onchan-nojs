@@ -165,6 +165,23 @@ def select_boards(db_file=config['db_name']):
         boards.append(board)
     return boards
 
+def select_board(path, page, db_file=config['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    cur.execute(f'''SELECT * FROM board 
+                    WHERE path = ? LIMIT 1''', (f'/{path}/',))
+    rows = cur.fetchall()
+    boards = []
+    for row in rows:
+        (path2, name, description) = row
+        board = Board(
+            path=path2, 
+            name=name, 
+            description=description, 
+            threads=select_threads(path, page, limit=10))
+        return board
+    return None
+
 # TODO: Optimize this nasty query. Two sorts and a double select
 def select_quotes(thread, limit=100, db_file=config['db_name']):
     conn = create_connection(db_file)

@@ -5,7 +5,7 @@ import html, re, os, cgi, random, enum, hashlib, logging, calendar, string, secr
 from functools import wraps
 from datetime import datetime
 
-from data import Board, Content, Image, insert_content, insert_image, select_boards, select_thread, select_threads
+from data import Board, Content, Image, insert_content, insert_image, select_boards, select_board, select_thread, select_threads
 from util import save_image, image_dimensions
 from config import config
 from argon2 import PasswordHasher
@@ -254,12 +254,10 @@ def serve_static(filepath):
 ## BOARDS
 
 @app.route('/<path>/')
-def render_board(path, cookie=False):
+def render_board(path, page=1, cookie=False):
     """ Render board into index.html """
     boards = select_boards()
-    threads = select_threads(path=path, page=1)
-    board = next(filter(lambda b: b.path == f"/{path}/", boards))
-    board.threads = threads
+    board = select_board(path, page)
     ctx = TemplateContext(
             content='html/pages/board.html', 
             boards=boards,
