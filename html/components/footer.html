@@ -1,6 +1,6 @@
 <footer style="display: block;" id="bottom">
     %if ctx.board or ctx.thread:
-        <div style="display: block; text-align: right; align-items: flex-start; float: left; padding-left: 10px">
+        <div style="display: block; text-align: right; align-items: flex-start; float: left; padding: 10px">
             <button>Previous</button>
             <small>
             %for i in range(1, 11):
@@ -13,7 +13,7 @@
             </small>
             <button>Next</button>
         </div>
-        <div style="display: block; text-align: right; align-items: flex-end; float: right; padding-right: 10px">
+        <div style="display: block; text-align: right; align-items: flex-end; float: right; padding: 10px">
             <small>
                 Delete Post: [<input class="input-delete" type="checkbox"/>&nbsp;File Only]
                 <button>Delete</button>
@@ -22,10 +22,6 @@
         </div>
     %end
     <div align="center" style="display:block;">
-        <br/>
-        <br/>
-        <br/>
-        <br/>
         <strong>
             <p>{{ctx.config['attribution']}}</p>
         </strong>

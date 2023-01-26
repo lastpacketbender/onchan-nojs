@@ -1,76 +1,38 @@
 #!/usr/bin/env python3
 
 from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode
-import html, re, os, cgi, random, enum, hashlib, logging, calendar, string, secrets
-from functools import wraps
+import html, re, os, cgi, random, enum, hashlib, calendar, string, secrets
 from datetime import datetime
 
-from data import Board, Content, Image, insert_content, insert_image, select_boards, select_board, select_thread, select_threads
-from util import save_image, image_dimensions
-from config import config
 from argon2 import PasswordHasher
 
-logger = logging.getLogger('onchan')
-
-# set up the logger
-logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('onchan.log')
-formatter = logging.Formatter('%(msg)s')
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-cookie_opts = {
-    # Aylmao, 4chan keeps cookies for 1 year, we'll keep a month. 
-    # Clean up your messes quickly.
-    'max_age': config['cookies']['max_age'],
-    'path': '/',
-    'httponly': True,
-    'secure': request.headers.get('X-Forwarded-Proto') == 'https',
-}
-
-def log_to_logger(fn):
-    '''
-    Wrap a Bottle request so that a log line is emitted after it's handled.
-    (This decorator can be extended to take the desired logger as a param.)
-    '''
-    @wraps(fn)
-    def _log_to_logger(*args, **kwargs):
-        request_time = datetime.now()
-        actual_response = fn(*args, **kwargs)
-        # modify this to log exactly what you need:
-        logger.info('%s %s %s %s %s' % (request.remote_addr,
-                                        request_time,
-                                        request.method,
-                                        request.url,
-                                        response.status))
-        return actual_response
-    return _log_to_logger
-
-app = Bottle()
-app.install(log_to_logger)
+from data import *
+from util import save_image, image_dimensions
+from log import log_to_logger
+from config import config
+from validations import *
 
 class TemplateContext:
     def __init__(self,
-                    board = None,
-                    boards = None,
-                    thread = None,
-                    config = config,
-                    reply=False,
-                    catalog=False,
-                    page_title=config['branding'],
-                    error_title="Error",
-                    limit = -1,
-                    message = None,
-                    content = None,
-                    nav = 'html/components/nav.html',
-                    footer = 'html/components/footer.html',
-                    upload = 'html/components/upload.html',
-                    replies = 'html/components/replies.html',
-                    content_info = 'html/components/content/content_info.html',
-                    file_info = 'html/components/content/file_info.html',
-                    thread_content = 'html/components/content/thread_content.html',
-                    comment_line = 'html/components/content/comment_line.html'):  
+                board = None,
+                boards = None,
+                thread = None,
+                config = config,
+                reply=False,
+                catalog=False,
+                page_title=config['branding'],
+                error_title="Error",
+                limit = -1,
+                message = None,
+                content = None,
+                nav = 'html/components/nav.html',
+                footer = 'html/components/footer.html',
+                upload = 'html/components/upload.html',
+                replies = 'html/components/replies.html',
+                content_info = 'html/components/content/content_info.html',
+                file_info = 'html/components/content/file_info.html',
+                thread_content = 'html/components/content/thread_content.html',
+                comment_line = 'html/components/content/comment_line.html'):  
         self.board = board
         self.boards = boards
         self.thread = thread
@@ -90,6 +52,18 @@ class TemplateContext:
         self.message = message
         self.content = content
         self.error_title = error_title
+
+cookie_opts = {
+    # Aylmao, 4chan keeps cookies for 1 year, we'll keep a month. 
+    # Clean up your messes quickly.
+    'max_age': config['cookies']['max_age'],
+    'path': '/',
+    'httponly': True,
+    'secure': request.headers.get('X-Forwarded-Proto') == 'https',
+}
+
+app = Bottle()
+app.install(log_to_logger)
 
 def merge_dicts(*args):
     result = {}
@@ -158,62 +132,6 @@ def save_comment_and_file(path, data, name, options, comment, password_hash=None
     print(password, hash)
     return content_id, image_id
 
-# VALIDATIONS
-
-
-def validate_file(data):
-    messages = []
-    supported_files = ('.bmp', '.png', '.jpg', '.jpeg', '.gif', '.tiff', '.webm')
-    if data.filename != "empty":
-        _, ext = os.path.splitext(data.filename)
-        if not ext:
-            messages.append("image required")
-        elif ext and ext.lower() not in supported_files:
-            messages.append("not a supported filetype")
-        else:
-            # File is attached and non-zero in size
-            data.file.seek(0, os.SEEK_END)
-            size = data.file.tell()
-            data.file.seek(0, os.SEEK_SET)
-            if size <= 0:
-                messages.append("empty file found")
-            elif size >= 1024 ** 2 * 5:
-                messages.append("file larger than 5 MB limit")
-    else:
-        messages.append("image required")
-    return True if len(messages) == 0 else False, messages
-
-def validate_comment(comment):
-    messages = []
-    if not comment:
-        messages.append("comment is a required field")
-    else:
-        if len(comment) > 2000:
-            messages.append("comment is larger than 2000 character limit")
-    return True if len(messages) == 0 else False, messages
-
-def validate_new_thread(name, subject, options, comment, data):
-    # TODO: length of name, subject, options
-    valid_file, file_messages = validate_file(data)
-    
-    # if not name: Defaulted in database
-    valid_comment, comment_messages = validate_comment(comment)
-    
-    return valid_comment and valid_file, ', '.join(file_messages + comment_messages)
-
-def validate_new_reply(name, options, comment, data):
-    # TODO: length of name, subject, options
-    if data.filename != 'empty':
-        valid_file, file_messages = validate_file(data)
-    else:
-        # Skip, images aren't required in replies
-        valid_file, file_messages = True, []
-    
-    # if not name: Defaulted in database
-    valid_comment, comment_messages = validate_comment(comment)
-    
-    return valid_comment and valid_file, ', '.join(file_messages + comment_messages)
-
 # ERROR PAGES
 
 @app.error(404)
@@ -268,7 +186,7 @@ def serve_static(filepath):
 
 ## BOARDS
 
-@app.route('/<path>/')
+@app.route('/<path:re:[a-z]{1,3}>/')
 def render_board(path, page=1, cookie=False):
     """ Render board into index.html """
     boards = select_boards()
@@ -288,15 +206,14 @@ def render_board(path, page=1, cookie=False):
         response.set_cookie(config['cookies']['name'], encoded, secret=config['cookies']['key'], **cookie_opts)
     return resp
 
-@app.route('/<path>/upload', method='POST')
+@app.route('/<path:re:[a-z]{1,3}>/upload', method='POST')
 def upload(path):
     name = request.forms.get('name')
     subject = request.forms.get('subject')
     options = request.forms.get('options')
     comment = request.forms.get('comment')
     data = request.files.get("file", "")
-    valid_thread, message = validate_new_thread(name, subject, options, comment, data)
-    
+    valid_thread, message = validate_new_thread(name, subject, options, comment, data)   
     if valid_thread:
         ph = PasswordHasher()
         password_hash = ph.hash('test')
@@ -309,7 +226,7 @@ def upload(path):
 
 # THREADS
 
-@app.route('/<path>/thread/<thread>')
+@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>')
 def render_thread(path, thread, cookie=False):
     """ Render thread into index.html """
     boards = select_boards()
@@ -331,7 +248,7 @@ def render_thread(path, thread, cookie=False):
     else:
         return not_found(None)
 
-@app.route('/<path>/thread/<thread>/upload', method='POST')
+@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
 def upload_thread(path, thread):
     name = request.forms.get('name')
     options = request.forms.get('options')
@@ -347,7 +264,7 @@ def upload_thread(path, thread):
     else:
         return your_bad(None)
  
-@app.route('/<path>/catalog')
+@app.route('/<path:re:[a-z]{1,3}>/catalog')
 def render_catalog(path):
     """ Render board catalog into index.html """
     boards = select_boards()
@@ -360,8 +277,7 @@ def render_catalog(path):
         boards=boards,
         board=board,
         catalog=True,
-        page_title=get_title(path=path, name=board.name)
-    )
+        page_title=get_title(path=path, name=board.name))
     return template(
         'html/index.html',  
         ctx=ctx)
@@ -374,11 +290,10 @@ def landing():
     boards = select_boards()
     ctx = TemplateContext(
         boards=boards, 
-        content='html/pages/home.html'
-    )
+        content='html/pages/home.html')
     return template('html/index.html', ctx=ctx)
 
-# AUXILARY PAGES
+# INFO PAGES
 
 @app.route('/legal')
 def legal():
@@ -387,8 +302,7 @@ def legal():
     ctx = TemplateContext(
         content='html/pages/legal.html',
         boards=boards,
-        page_title=get_title(extra='Legal')
-    )
+        page_title=get_title(extra='Legal'))
     return template('html/index.html', ctx=ctx)
 
 @app.route('/contact')
@@ -398,8 +312,7 @@ def contact():
     ctx = TemplateContext(
         content='html/pages/contact.html',
         boards=boards,
-        page_title=get_title(extra='Contact')
-    )
+        page_title=get_title(extra='Contact'))
     return template('html/index.html', ctx=ctx)
 
 @app.route('/feedback')
@@ -409,8 +322,7 @@ def feedback():
     ctx = TemplateContext(
         content='html/pages/feedback.html',
         boards=boards, 
-        page_title=get_title(extra='Feedback')
-    )
+        page_title=get_title(extra='Feedback'))
     return template('html/index.html', ctx=ctx)
 
 @app.route('/about')
@@ -420,8 +332,7 @@ def about():
     ctx = TemplateContext(
         content='html/pages/about.html',
         boards=boards, 
-        page_title=get_title(extra='About')
-    )
+        page_title=get_title(extra='About'))
     return template('html/index.html', ctx=ctx)
 
 @app.route('/rules')
@@ -431,8 +342,7 @@ def rules():
     ctx = TemplateContext(
         content='html/pages/rules.html',
         boards=boards, 
-        page_title=get_title(extra='Rules')
-    )
+        page_title=get_title(extra='Rules'))
     return template('html/index.html', ctx=ctx)
 
 @app.route('/faq')
@@ -442,8 +352,7 @@ def faq():
     ctx = TemplateContext(
         content='html/pages/faq.html',
         boards=boards, 
-        page_title=get_title(extra='FAQ')
-    )
+        page_title=get_title(extra='FAQ'))
     return template('html/index.html', ctx=ctx)
 
 app.run(
