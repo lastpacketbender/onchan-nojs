@@ -6,8 +6,6 @@ CLEAN UP
 
 DOCUMENTATION
     - Other error pages
-    - FAQ
-    - Rules
     - Post deletion after X amount of time
 
 SECURITY
@@ -31,16 +29,10 @@ DATA
     - Bump limit
 
 COSMETIC FIXES
-    - Ellipsis on file name/others in post
-    - Mobile responsiveness (reorganize responses to more vertical
     - Fix bottom and right padding of quotes
-
-RESEARCH
-    - Handle pages with trigger or use math
 
 BUG FIXES
     - strip submission
-    - render comment as is (iterate char by char, split between matches, iterate over splits with wraps)
 
 FEATURES
     - Add (Dead) for IDs no longer existing
@@ -56,7 +48,6 @@ FEATURES
         - SQL meta tables and stats
         - Indexes
         - Reporting
-    - Password cookie after posting for ids
     - Options
         - sage (don't bump thread)
         - nonoko (use old posting functionality)
@@ -81,7 +72,6 @@ CONFIGURATION
         - num pages
         - special rules
         - bump limit
-    - Pages (legal, about, contact, feedback, rules, faq, with ability to disable any)
 
 NICE TO HAVES
     - Save LATEST version for crypto
