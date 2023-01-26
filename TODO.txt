@@ -41,7 +41,6 @@ FEATURES
         - FAILGETs WINGETs
         - /4get/ (to obtain 4chan gets)
     - DB
-        - Backend for popping off/removing posts as boards exceed threshold (triggers or part of app?)
         - Bump limit
         - Pagination
         - Delete  
@@ -61,6 +60,10 @@ FEATURES
     - Admin functionality
         - Sticky
         - Lock
+    - Reporting
+    - Delete
+        - Post and image
+        - Image only
 
 CONFIGURATION
     - Boards (path, description, name, special rules)

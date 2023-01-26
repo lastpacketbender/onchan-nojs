@@ -59,6 +59,7 @@ class TemplateContext:
                     reply=False,
                     catalog=False,
                     page_title=config['branding'],
+                    error_title="Error",
                     limit = -1,
                     message = None,
                     content = None,
@@ -88,6 +89,7 @@ class TemplateContext:
         self.limit = limit
         self.message = message
         self.content = content
+        self.error_title = error_title
 
 def merge_dicts(*args):
     result = {}
@@ -217,28 +219,41 @@ def validate_new_reply(name, options, comment, data):
 @app.error(404)
 def not_found(err):
     boards = select_boards()
+    ctx = TemplateContext(
+        content='html/pages/error.html', 
+        boards=boards,
+        page_title=get_title(extra="404: Not found"),
+        error_title="Not found",
+        message="Lurk moar")
     return template(
         'html/index.html', 
-        config=config,
-        boards=boards, 
-        board=None, 
-        title="404: Not found",
-        message="Not found: OP is a _",
-        content='html/pages/error.html',
-        page_title=get_title(extra="Not found"))
+        ctx=ctx)
 
 @app.error(400)
-def bad_request(err):
+def your_bad(err):
     boards = select_boards()
+    ctx = TemplateContext(
+            content='html/pages/error.html', 
+            boards=boards,
+            page_title=get_title(extra="400: Bad request"),
+            error_title="Bad request",
+            message="Your bad, if a validation error - email me")
     return template(
         'html/index.html', 
-        config=config,
-        boards=boards, 
-        board=None,
-        title="400: Bad request",
-        message="Your bad",
-        content='html/pages/error.html',
-        page_title=get_title(extra="Bad request"))
+        ctx=ctx)
+
+@app.error(500)
+def my_bad(err):
+    boards = select_boards()
+    ctx = TemplateContext(
+            content='html/pages/error.html', 
+            boards=boards,
+            page_title=get_title(extra="500: Internal server error"),
+            error_title="Internal server error",
+            message="Internal server error - email me what you were doing/inputs")
+    return template(
+        'html/index.html', 
+        ctx=ctx)
 
 # STATIC FILES
 
@@ -290,7 +305,7 @@ def upload(path):
         content_id, image_id = save_comment_and_file(path, data, name, options, comment, password_hash, subject=subject)
         return render_board(path, cookie=True)
     else:
-        return bad_request(None)
+        return your_bad(None)
 
 # THREADS
 
@@ -330,7 +345,7 @@ def upload_thread(path, thread):
             content_id = save_comment(path, name, options, comment, thread=thread)
         return render_thread(path, thread, cookie=True)
     else:
-        return bad_request(None)
+        return your_bad(None)
  
 @app.route('/<path>/catalog')
 def render_catalog(path):

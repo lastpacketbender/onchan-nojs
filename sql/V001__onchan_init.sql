@@ -154,6 +154,26 @@ BEGIN
  	WHERE content.id = NEW.thread_id;
 END;
 
+-- Roll threads past 100 for each board after insertion
+CREATE TRIGGER IF NOT EXISTS roll_threads_trigger
+	AFTER INSERT ON content
+	WHEN (SELECT
+			CASE WHEN COUNT(*) > 100 
+			THEN 1 
+			ELSE 0 
+			END 
+		  FROM (SELECT id 
+		  		FROM content 
+				WHERE board = NEW.board 
+				AND thread_id IS NULL))
+BEGIN
+	DELETE FROM content
+	WHERE created = (SELECT MIN(created) 
+						FROM content 
+						WHERE board = NEW.board 
+						AND thread_id IS NULL);
+END;
+
 -- Maintain rolling queue for threads
 -- CREATE TRIGGER IF NOT EXISTS roll_threads
 -- 	BEFORE INSERT ON content
