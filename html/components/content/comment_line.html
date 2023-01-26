@@ -1,32 +1,47 @@
 <!-- Used in thread.html, comment.html, board.html-->
 %import string, re
-%if '>' not in line:
+%if '>' not in line and ':' not in line:
     {{line}}
 %elif re.match(r"^>[^>]*$", line):
     <span class="greentext">{{line}}</span>
 %else:
     %boards = [m.start() for m in re.finditer(r">>>/[a-z]{1,3}/", line)] + [m.end() for m in re.finditer(r">>>/[a-z]{1,3}/", line)]
     %replies = [m.start() for m in re.finditer(r">>[0-9]+", line)] + [m.end() for m in re.finditer(r">>[0-9]+", line)]
+    %emotes = [m.start() for m in re.finditer(r":[a-z]+:", line)] + [m.end() for m in re.finditer(r":[a-z]+:", line)]
     %locations = set([0, len(line)])
 
     %if boards:
-        %locations.update([start for start in [x for x in boards]])
+        %locations.update([y for y in [x for x in boards]])
     %end
     %if replies:
-        %locations.update(start for start in [x for x in replies])
+        %locations.update([y for y in [x for x in replies]])
+    %end
+    %if emotes:
+        %locations.update([y for y in [x for x in emotes]])
     %end
 
     %locations = list(sorted(locations))
     %segments = [line[i:j] for i,j in zip(locations, locations[1:]+[None])]
     %greentext = False
+    %emotes = [':k:', ':o:', ':t:']
     %for i, segment in enumerate(segments):
-        %if segment[:3] == '>>>':
+        %if segment in emotes:
+            %replaced = segment.replace(':', '')
+            %if replaced == 'k':
+                <img src="/public/emote/k.png" width="37" height="30">
+            %elif replaced == 'o':
+                <img src="/public/emote/o.png" width="37" height="30">
+            %elif replaced == 't':
+                <img src="/public/emote/t.png" width="37" height="30">
+            %end
+        %elif segment[:3] == '>>>' and segment[-1] == '/':
             <a href="{{segment.replace('>', '')}}">{{segment}}</a>
-        %elif segment[:2] == '>>':
+        %elif segment[:2] == '>>' and segment[-1].isdigit():
+            %replaced = segment.replace('>', '')
             %if ctx.thread:
-            <a href="{{ctx.board.path}}thread/{{segment.replace('>', '')}}">{{segment}}</a>
+                <a href="{{ctx.board.path}}thread/{{replaced}}">{{segment}}{{" (OP)" if replaced == str(ctx.thread.id) else ""}}</a>
             %else:
-            <a href="{{ctx.board.path}}thread/{{segment.replace('>', '')}}">{{segment}}</a>
+                <a href="{{ctx.board.path}}thread/{{replaced}}">{{segment}}{{" (OP)" if replaced == str(thread.id) else ""}}</a>
             %end
         %elif i == 0 and segment[0] == '>':
             <span class="greentext">{{segment}}</span>
