@@ -1,20 +1,35 @@
-<footer id="bottom">
-    <strong>
-        <p>{{ctx.config['attribution']}}</p>
-    </strong>
-    <ul class="horizontal-links">
-        <a href="/about">
-            <li>About</li>
-        </a>
-        <a href="/feedback">
-            <li>Feedback</li>
-        </a>
-        <a href="/legal">
-            <li>Legal</li>
-        </a>
-        <a href="/contact">
-            <li>Contact</li>
-        </a>
-    </ul>
-    <p>{{ctx.config['info']['disclaimer']}}</p>
+<footer style="display: block;" id="bottom">
+    %if ctx.board or ctx.thread:
+    <div style="display: block; text-align: right; align-items: flex-end; float: right; padding-right: 10px">
+        Delete Post: [<input class="input-delete" type="checkbox"/>&nbsp;File Only]
+        <button>Delete</button>
+        <button>Report</button>
+    </div>
+    %end
+    <br/>
+    <br/>
+    <div align="center" >
+        <strong>
+            <p>{{ctx.config['attribution']}}</p>
+        </strong>
+        <small>
+            <ul class="horizontal-links">
+                <a href="/about">
+                    <li>About</li>
+                </a>
+                <a href="/feedback">
+                    <li>Feedback</li>
+                </a>
+                <a href="/legal">
+                    <li>Legal</li>
+                </a>
+                <a href="/contact">
+                    <li>Contact</li>
+                </a>
+            </ul>
+        </small>
+        <small>
+            <p>{{ctx.config['info']['disclaimer']}}</p>
+        </small>
+    </div>
 </footer>

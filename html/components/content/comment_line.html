@@ -24,9 +24,9 @@
             <a href="{{segment.replace('>', '')}}">{{segment}}</a>
         %elif segment[:2] == '>>':
             %if ctx.thread:
-            <a href="{{ctx.board.path}}thread/{{ctx.thread.id}}">{{segment}}</a>
+            <a href="{{ctx.board.path}}thread/{{segment.replace('>', '')}}">{{segment}}</a>
             %else:
-            <a href="{{ctx.board.path}}thread/{{thread.id}}">{{segment}}</a>
+            <a href="{{ctx.board.path}}thread/{{segment.replace('>', '')}}">{{segment}}</a>
             %end
         %elif i == 0 and segment[0] == '>':
             <span class="greentext">{{segment}}</span>
