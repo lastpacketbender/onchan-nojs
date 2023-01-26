@@ -1,7 +1,8 @@
 import sqlite3
 from datetime import datetime
+from config import config
 
-# TODO: Make configurable
+# TODO: Make DB name configurable
 
 class Image:
     def __init__(self,
@@ -79,7 +80,7 @@ class DeletionAuth:
         self.password_hash = password_hash
 
 
-def create_connection(db_file="onchan.db"):
+def create_connection(db_file=config['db_name']):
     conn = None
     try:
         conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
@@ -89,7 +90,7 @@ def create_connection(db_file="onchan.db"):
 
     return conn
 
-def insert_image(img, thread, db_file="onchan.db", parent=None):
+def insert_image(img, thread, db_file=config['db_name'], parent=None):
     if img:
         conn = create_connection(db_file)
         conn.set_trace_callback(print)
@@ -111,7 +112,7 @@ def insert_image(img, thread, db_file="onchan.db", parent=None):
     return None
 
 
-def insert_content(content, img=None, db_file="onchan.db", parent=None):
+def insert_content(content, img=None, db_file=config['db_name'], parent=None):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''INSERT INTO content(created, board, thread_id, page, name, options, subject, comment)
@@ -128,14 +129,14 @@ def insert_content(content, img=None, db_file="onchan.db", parent=None):
     conn.commit()
     return cur.lastrowid
 
-def delete_image(content_id, password_hash, db_file="onchan.db"):
+def delete_image(content_id, password_hash, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''DELETE FROM image WHERE content_id = ? and password_hash = ?''', (content_id, password_hash))
     conn.commit()
     return cur.lastrowid
 
-def delete_content(content_id, db_file="onchan.db"):
+def delete_content(content_id, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''DELETE FROM content WHERE id = ? and password_hash = ?''', (content_id, password_hash))
@@ -151,7 +152,7 @@ def delete_content(content_id, db_file="onchan.db"):
 #     conn.commit()
 # TODO: page and limit
 
-def select_boards(db_file="onchan.db"):
+def select_boards(db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''SELECT * FROM board 
@@ -165,7 +166,7 @@ def select_boards(db_file="onchan.db"):
     return boards
 
 # TODO: Optimize this nasty query. Two sorts and a double select
-def select_quotes(thread, limit=100, db_file="onchan.db"):
+def select_quotes(thread, limit=100, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''SELECT * FROM (SELECT * FROM content 
@@ -192,7 +193,7 @@ def select_quotes(thread, limit=100, db_file="onchan.db"):
     return quotes
 
 
-def select_threads(path, page, limit=100, db_file="onchan.db"):
+def select_threads(path, page, limit=100, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''SELECT * FROM content 
@@ -234,7 +235,7 @@ def select_threads(path, page, limit=100, db_file="onchan.db"):
         threads.append(content)
     return threads
 
-def select_thread(path, id, limit=100, db_file="onchan.db"):
+def select_thread(path, id, limit=100, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     # TODO: Don't need this many conditions

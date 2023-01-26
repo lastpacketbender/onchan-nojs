@@ -6,6 +6,7 @@ config = {
     "images": {
         "dir": "./public/img"
     },
+    "db_name": "onchan.db",
     "server": {
         "debug": True,
         "reload": True,
