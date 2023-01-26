@@ -64,9 +64,6 @@ def save_image(data):
             return False, None, None, None, "File larger than 5 MB"
         data.file.seek(0, os.SEEK_SET)
         # TODO: Verify image headers, check for steganography
-        # TODO: Read image dimensions
-        # TODO: size with *B using convert_units
-        # TODO: Pad zeroes in ID
         raw = data.file.read() # This is dangerous for big files
         filename = data.filename
         save_path = f"{os.getcwd()}/{config['images']['dir']}"
