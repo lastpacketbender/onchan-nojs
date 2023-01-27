@@ -13,7 +13,10 @@ All configuration is managed through [config.py](./config.py).
     "images": {
         "dir": "<path to hosted images>"
     },
-    "db_name": "<name of SQLite DB file>.db",
+    "data": {
+        "db_name": "<name of SQLite DB file>.db",
+        "migration_dir": "<name of directory with SQL migrations>"
+    },
     "server": {
         "debug": True,
         "reload": True,
@@ -43,7 +46,18 @@ All configuration is managed through [config.py](./config.py).
         "key": "<secret for encrypting/decrypting cookies>",
         "name": "<cookie name for post/image deletion>",
         "max_age": 3600 * 24 * 30
-    }
+    },
+    "boards": [
+        {
+            "path": "<path in URL>",
+            "name": "<name of board>",
+            "description": "<board description>",
+            "thread_limit": 100,
+            "image_limit": 50,
+            "bump_limit": 100
+        }
+        ...
+    ]
 }
 ```
 
