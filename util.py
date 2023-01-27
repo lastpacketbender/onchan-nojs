@@ -69,7 +69,7 @@ def save_image(data):
         save_path = f"{os.getcwd()}/{config['images']['dir']}"
         # TODO: Use sequence in table that wraps at 8 digits
         image_id = calendar.timegm(datetime.now().timetuple())
-        saved_filename = f"{str(image_id).zfill(12)}{ext}"
+        saved_filename = f"{str(image_id)}{ext}"
         save_file = f"{save_path}/{saved_filename}"
         if not os.path.exists(save_path):
             os.makedirs(save_path)

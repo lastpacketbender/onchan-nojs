@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode
+from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode, cookie_decode
 import html, re, os, cgi, random, enum, hashlib, calendar, string, secrets
 from datetime import datetime
 
@@ -84,7 +84,7 @@ def get_title(path=None, name=None, subject=None, extra=None):
     components.append(config['branding'])
     return ' - '.join(components)
 
-def save_comment(path, name, options, comment, thread=None, subject=None):
+def save_comment(path, name, options, comment, password_hash=None, thread=None, subject=None):
     content = Content(
             board=f"/{path}/", 
             thread_id=thread, 
@@ -93,10 +93,14 @@ def save_comment(path, name, options, comment, thread=None, subject=None):
             options=options,
             subject=subject,
             comment=comment)
+    # empty var from tuple is delayed auth_id for inserting in next line as a pair
     content_id = insert_content(content)
-    return content_id
+    auth_id = None
+    if password_hash:
+        auth_id = insert_deletion_auth(content_id, password_hash)
+    return content_id, auth_id
 
-def save_comment_and_file(path, data, name, options, comment, password_hash=None, thread=None, subject=None):
+def save_comment_and_file(path, data, name, options, comment, password_hash, thread=None, subject=None):
     content = Content(
         board=f"/{path}/", 
         thread_id=thread, 
@@ -105,7 +109,7 @@ def save_comment_and_file(path, data, name, options, comment, password_hash=None
         options=options,
         subject=subject,
         comment=comment)
-    content_id = save_comment(path, name, options, comment, thread=thread, subject=subject)
+    content_id, _ = save_comment(path, name, options, comment, thread=thread, subject=subject)
     if data:
         success, image_id, filename, size, digest, msg = save_image(data)
         if not success:
@@ -125,12 +129,10 @@ def save_comment_and_file(path, data, name, options, comment, password_hash=None
             # TODO: Get latest by query
             version=1
         )
+        # empty tuple val is delayed auth_id for inserting in next line as a pair
         image_id = insert_image(img, thread)
-    ph = PasswordHasher()
-    password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for _ in range(32)])
-    hash = ph.hash(password)
-    print(password, hash)
-    return content_id, image_id
+        auth_id = insert_deletion_auth(content_id, password_hash, image_id=image_id)
+    return content_id, image_id, auth_id
 
 # ERROR PAGES
 
@@ -199,12 +201,22 @@ def render_board(path, page=1, cookie=False):
             reply=True,
             page_title=get_title(path=path, name=board.name))
     resp = template('html/index.html', ctx=ctx)
-    if cookie:
-        password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for x in range(32)])
-        # TODO: Maybe store on the fly keys instead
-        encoded = cookie_encode(password, config['cookies']['key'])
-        response.set_cookie(config['cookies']['name'], encoded, secret=config['cookies']['key'], **cookie_opts)
     return resp
+
+@app.route('/<path:re:[a-z]{1,3}>/delete', method='POST')
+def delete_board(path, page=1, cookie=False):
+    """ Render board into index.html """
+    on = [x for x in request.forms.decode()]
+    ids = [x for x in on if x.isdigit()]
+    password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
+    if password_hash:
+        if 'delete-file-only' in on:
+            delete_images(ids, password_hash)
+            print(">>>> DELETING FILE ONLY", ids)
+        else:
+            delete_contents(ids, password_hash)
+            print(">>>> DELETING CONTENTS", ids)
+    return redirect(f"/{path}/")
 
 @app.route('/<path:re:[a-z]{1,3}>/upload', method='POST')
 def upload(path):
@@ -215,12 +227,14 @@ def upload(path):
     data = request.files.get("file", "")
     valid_thread, message = validate_new_thread(name, subject, options, comment, data)   
     if valid_thread:
-        ph = PasswordHasher()
-        password_hash = ph.hash('test')
-        ph.verify(password_hash, 'test')
-        ph.check_needs_rehash(password_hash)
-        content_id, image_id = save_comment_and_file(path, data, name, options, comment, password_hash, subject=subject)
-        return render_board(path, cookie=True)
+        password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
+        if not password_hash:
+            ph = PasswordHasher()
+            password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for _ in range(32)])
+            password_hash = ph.hash(password)
+            response.set_cookie(config['cookies']['name'], password_hash, secret=config['cookies']['key'], **cookie_opts)
+        content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, subject=subject)
+        return redirect(f"/{path}/")
     else:
         return your_bad(None)
 
@@ -248,6 +262,21 @@ def render_thread(path, thread, cookie=False):
     else:
         return not_found(None)
 
+@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>/delete', method='POST')
+def delete_thread(path, thread):
+    """ Render board into index.html """
+    on = [x for x in request.forms.decode()]
+    ids = [x for x in on if x.isdigit()]
+    password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
+    if password_hash:
+        if 'delete-file-only' in on:
+            delete_images(ids, password_hash)
+            print(">>>> DELETING FILE ONLY", ids)
+        else:
+            delete_contents(ids, password_hash)
+            print(">>>> DELETING CONTENTS", ids)
+    return redirect(f"/{path}/")
+
 @app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
 def upload_thread(path, thread):
     name = request.forms.get('name')
@@ -256,11 +285,19 @@ def upload_thread(path, thread):
     data = request.files.get("file", "")
     valid_reply, message = validate_new_reply(name, options, comment, data)
     if valid_reply:
-        if data.filename != 'empty':
-            content_id, image_id = save_comment_and_file(path, data, name, options, comment, thread=thread)
+        password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
+        if not password_hash:
+            ph = PasswordHasher()
+            password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for _ in range(32)])
+            password_hash = ph.hash(password)
+            response.set_cookie(config['cookies']['name'], password_hash, secret=config['cookies']['key'], **cookie_opts)
         else:
-            content_id = save_comment(path, name, options, comment, thread=thread)
-        return render_thread(path, thread, cookie=True)
+            print("Existing hash", password_hash)
+        if data.filename != 'empty':
+            content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, thread=thread)
+        else:
+            content_id, auth_id = save_comment(path, name, options, comment, thread=thread, password_hash=password_hash)
+        return redirect(f"/{path}/thread/{thread}")
     else:
         return your_bad(None)
  

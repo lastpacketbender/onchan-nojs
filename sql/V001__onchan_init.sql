@@ -81,7 +81,8 @@ CREATE TABLE IF NOT EXISTS content(
 	comment text NOT NULL,
 	replies INTEGER DEFAULT 0,
 	image_replies INTEGER DEFAULT 0,
-	FOREIGN KEY(thread_id) REFERENCES content(content_id),
+	FOREIGN KEY(thread_id) REFERENCES content(content_id)
+		ON DELETE CASCADE,
 	FOREIGN KEY(board) REFERENCES board(path) 
 		ON DELETE CASCADE
 	-- UNIQUE(comment)
@@ -104,14 +105,15 @@ CREATE TABLE IF NOT EXISTS image(
 		ON DELETE CASCADE,
 	FOREIGN KEY(version) REFERENCES crypto(id)
 		ON DELETE CASCADE,
-	FOREIGN KEY(thread_id) REFERENCES content(content_id),
+	FOREIGN KEY(thread_id) REFERENCES content(content_id)
+		ON DELETE CASCADE,
 	UNIQUE(content_id)
 );
 
 CREATE TABLE IF NOT EXISTS deletion_auth(
 	content_id INTEGER PRIMARY KEY NOT NULL,
 	image_id INTEGER,
-	pass TEXT NOT NULL,
+	password_hash TEXT NOT NULL,
 	FOREIGN KEY(content_id) REFERENCES content(id)
 		ON DELETE CASCADE,
 	FOREIGN KEY(image_id) REFERENCES images(id)
@@ -144,6 +146,14 @@ BEGIN
 	WHERE content.id = NEW.thread_id;
 END;
 
+CREATE TRIGGER IF NOT EXISTS decrement_replies_trigger
+	AFTER DELETE ON content
+	WHEN OLD.thread_id IS NOT NULL
+BEGIN
+	UPDATE content SET replies = replies - 1
+	WHERE content.id = OLD.thread_id;
+END;
+
 -- Maintain counts for image replies
 CREATE TRIGGER IF NOT EXISTS image_omission_trigger
    	BEFORE INSERT ON image
@@ -154,16 +164,24 @@ BEGIN
  	WHERE content.id = NEW.thread_id;
 END;
 
+CREATE TRIGGER IF NOT EXISTS decrement_images_trigger
+	AFTER DELETE ON image
+	WHEN OLD.thread_id IS NOT NULL
+BEGIN
+	UPDATE content SET replies = replies - 1
+	WHERE content.id = OLD.thread_id;
+END;
+
 -- Roll threads past 100 for each board after insertion
 CREATE TRIGGER IF NOT EXISTS roll_threads_trigger
-	AFTER INSERT ON content
+	BEFORE INSERT ON content
 	WHEN (SELECT
-			CASE WHEN COUNT(*) > 100 
+			CASE WHEN COUNT(*) >= 100 
 			THEN 1 
 			ELSE 0 
 			END 
 		  FROM (SELECT id 
-		  		FROM content 
+				FROM content 
 				WHERE board = NEW.board 
 				AND thread_id IS NULL))
 BEGIN
@@ -173,13 +191,5 @@ BEGIN
 						WHERE board = NEW.board 
 						AND thread_id IS NULL);
 END;
-
--- Maintain rolling queue for threads
--- CREATE TRIGGER IF NOT EXISTS roll_threads
--- 	BEFORE INSERT ON content
--- BEGIN
--- 	-- if num posts < board per page * pages
--- 	--   delete oldest if not stickied and add to image deletion queue
--- END;
 
 INSERT OR IGNORE INTO migration(name) VALUES ('V001__onchan_init.sql');

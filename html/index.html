@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		%if ctx.page_title:
-		<title>{{ctx.page_title}}</title>
+			<title>{{ctx.page_title}}</title>
 		%end
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/public/style.css">
@@ -15,8 +15,17 @@
 	<body>
 		<div class="container">
 			%include(ctx.nav)
+			%if ctx.thread or ctx.board:
+				%include(ctx.upload)
+			%end
+			%if ctx.thread:
+				<form action="{{ctx.thread.id}}/delete" method="POST" enctype="multipart/form-data">
+			%else:
+				<form action="delete" method="POST" enctype="multipart/form-data">
+			%end
 			%include(ctx.content)
 			%include(ctx.footer)
+			</form>
 		</div>
 	</body>
 </html>

@@ -6,7 +6,7 @@ CLEAN UP
 
 DOCUMENTATION
     - Other error pages
-    - Post deletion after X amount of time
+    - User initiated deletion after X amount of time
 
 SECURITY
     DATA
@@ -32,7 +32,11 @@ COSMETIC FIXES
     - Fix bottom and right padding of quotes
 
 BUG FIXES
-    - strip submission
+    - Strip submission
+    - Fix submission to board/thread resulting in the POST path.
+        - Can we just modify the response for another location?
+        - Pad info pages to be vertically middle and align the footer with the bottom of the page.
+        - Allow submission of only an image
 
 FEATURES
     - Add (Dead) for IDs no longer existing

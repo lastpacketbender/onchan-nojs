@@ -2,8 +2,6 @@ import sqlite3
 from datetime import datetime
 from config import config
 
-# TODO: Make DB name configurable
-
 class Image:
     def __init__(self,
                  id=None,
@@ -90,10 +88,10 @@ def create_connection(db_file=config['db_name']):
 
     return conn
 
-def insert_image(img, thread, db_file=config['db_name'], parent=None):
+def insert_image(img, thread, db_file=config['db_name']):
+    print(img.content_id)
     if img:
         conn = create_connection(db_file)
-        conn.set_trace_callback(print)
         cur = conn.cursor()
         cur.execute(f'''INSERT INTO image(content_id, filename, orig_filename, size, width, height, checksum, version, url, thread_id)
                     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
@@ -112,34 +110,50 @@ def insert_image(img, thread, db_file=config['db_name'], parent=None):
     return None
 
 
-def insert_content(content, img=None, db_file=config['db_name'], parent=None):
+def insert_content(content, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''INSERT INTO content(created, board, thread_id, page, name, options, subject, comment)
-                   VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    content.created,
-                    content.board, 
-                    content.thread_id, 
-                    content.page,
-                    content.name,
-                    content.options,
-                    content.subject,
-                    content.comment))
+                   VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', (
+                        content.created,
+                        content.board, 
+                        content.thread_id, 
+                        content.page,
+                        content.name,
+                        content.options,
+                        content.subject,
+                        content.comment))
     conn.commit()
     return cur.lastrowid
 
-def delete_image(content_id, password_hash, db_file=config['db_name']):
+def insert_deletion_auth(content_id, password_hash, image_id=None, db_file=config['db_name']):
+    print(">>>>>>INSERT_DELETION_AUTH", password_hash, content_id, image_id)
     conn = create_connection(db_file)
     cur = conn.cursor()
-    cur.execute(f'''DELETE FROM image WHERE content_id = ? and password_hash = ?''', (content_id, password_hash))
+    cur.execute(f'''INSERT INTO deletion_auth(content_id, image_id, password_hash)
+                   VALUES(?, ?, ?)''', (
+                        content_id,
+                        image_id,
+                        password_hash))
     conn.commit()
     return cur.lastrowid
 
-def delete_content(content_id, db_file=config['db_name']):
+def delete_images(ids, password_hash, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
-    cur.execute(f'''DELETE FROM content WHERE id = ? and password_hash = ?''', (content_id, password_hash))
+    cur.execute(f'''DELETE FROM image 
+                    WHERE content_id IN ({','.join(ids)}) 
+                    AND (SELECT password_hash FROM deletion_auth WHERE image_id IN ({','.join(ids)})) = \'{password_hash}\'''')
+    conn.commit()
+    return cur.lastrowid
+
+def delete_contents(ids, password_hash, db_file=config['db_name']):
+    print(ids, password_hash)
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    cur.execute(f'''DELETE FROM content 
+                    WHERE id IN ({','.join(ids)}) 
+                    AND (SELECT password_hash FROM deletion_auth WHERE content_id IN ({','.join(ids)})) = ?''', (password_hash,))
     conn.commit()
     return cur.lastrowid
 
