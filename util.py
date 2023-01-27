@@ -65,6 +65,7 @@ def save_image(data):
         data.file.seek(0, os.SEEK_SET)
         # TODO: Verify image headers, check for steganography
         raw = data.file.read() # This is dangerous for big files
+        data.file.close()
         filename = data.filename
         save_path = f"{os.getcwd()}/{config['images']['dir']}"
         # TODO: Use sequence in table that wraps at 8 digits

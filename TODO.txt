@@ -12,7 +12,7 @@ DOCUMENTATION
     - User initiated deletion after X amount of time
 
 LOGGING
-    - OWASP loggin
+    - OWASP logging
     - Role log file
     - Configure log name/directory
 
@@ -33,14 +33,15 @@ SECURITY
             - alerting system for admin
 
 DATA
+    - Transactions
     - Saging
     - Bump limit
     - Create queue for deletion of files
     - Create ANSI SQL migrations for other DB/configuration
 
 COSMETIC FIXES
-    - Remove old "quote" notation
-    - Track replies to content for all types
+    - Remove old "quote" notation from html
+    - Track replies to content for all types via >> in comments
 
 BUG FIXES
     - Strip submission

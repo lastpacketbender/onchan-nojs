@@ -160,7 +160,7 @@ def create_connection(db_file=config['data']['db_name']):
     conn = None
     try:
         conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-        # conn.set_trace_callback(print)
+        conn.set_trace_callback(print)
     except Error as e:
         print(e)
 
