@@ -87,8 +87,7 @@ def get_title(path=None, name=None, subject=None, extra=None):
 def save_comment(path, name, options, comment, password_hash=None, thread=None, subject=None):
     content = Content(
             board=f"/{path}/", 
-            thread_id=thread, 
-            page=1, 
+            thread_id=thread,
             name=name, 
             options=options,
             subject=subject,
@@ -104,7 +103,6 @@ def save_comment_and_file(path, data, name, options, comment, password_hash, thr
     content = Content(
         board=f"/{path}/", 
         thread_id=thread, 
-        page=1, 
         name=name, 
         options=options,
         subject=subject,
@@ -188,8 +186,8 @@ def serve_static(filepath):
 
 ## BOARDS
 
-@app.route('/<path:re:[a-z]{1,3}>/')
-def render_board(path, page=1, cookie=False):
+@app.route('/<path:re:[a-z0-9]{1,3}>/')
+def render_board(path, page=1):
     """ Render board into index.html """
     boards = select_boards()
     board = select_board(path, page)
@@ -203,8 +201,23 @@ def render_board(path, page=1, cookie=False):
     resp = template('html/index.html', ctx=ctx)
     return resp
 
-@app.route('/<path:re:[a-z]{1,3}>/delete', method='POST')
-def delete_board(path, page=1, cookie=False):
+@app.route('/<path:re:[a-z0-9]{1,3}>/<page:int>')
+def render_board(path, page=1):
+    """ Render board into index.html """
+    boards = select_boards()
+    board = select_board(path, page)
+    ctx = TemplateContext(
+            content='html/pages/board.html', 
+            boards=boards,
+            board=board,
+            limit=5,
+            reply=True,
+            page_title=get_title(path=path, name=board.name))
+    resp = template('html/index.html', ctx=ctx)
+    return resp
+
+@app.route('/<path:re:[a-z0-9]{1,3}>/delete', method='POST')
+def delete_from_board(path, page=1):
     """ Render board into index.html """
     on = [x for x in request.forms.decode()]
     ids = [x for x in on if x.isdigit()]
@@ -218,7 +231,7 @@ def delete_board(path, page=1, cookie=False):
             print(">>>> DELETING CONTENTS", ids)
     return redirect(f"/{path}/")
 
-@app.route('/<path:re:[a-z]{1,3}>/upload', method='POST')
+@app.route('/<path:re:[a-z0-9]{1,3}>/upload', method='POST')
 def upload(path):
     name = request.forms.get('name')
     subject = request.forms.get('subject')
@@ -240,8 +253,8 @@ def upload(path):
 
 # THREADS
 
-@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>')
-def render_thread(path, thread, cookie=False):
+@app.route('/<path:re:[a-z0-9]{1,3}>/thread/<thread:re:[0-9]+>')
+def render_thread(path, thread):
     """ Render thread into index.html """
     boards = select_boards()
     board = next(filter(lambda b: f"/{path}/" == b.path, boards))
@@ -262,8 +275,8 @@ def render_thread(path, thread, cookie=False):
     else:
         return not_found(None)
 
-@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>/delete', method='POST')
-def delete_thread(path, thread):
+@app.route('/<path:re:[a-z0-9]{1,3}>/thread/<thread:re:[0-9]+>/delete', method='POST')
+def delete_from_thread(path, thread):
     """ Render board into index.html """
     on = [x for x in request.forms.decode()]
     ids = [x for x in on if x.isdigit()]
@@ -277,7 +290,7 @@ def delete_thread(path, thread):
             print(">>>> DELETING CONTENTS", ids)
     return redirect(f"/{path}/")
 
-@app.route('/<path:re:[a-z]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
+@app.route('/<path:re:[a-z0-9]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
 def upload_thread(path, thread):
     name = request.forms.get('name')
     options = request.forms.get('options')
@@ -299,7 +312,7 @@ def upload_thread(path, thread):
     else:
         return your_bad(None)
  
-@app.route('/<path:re:[a-z]{1,3}>/catalog')
+@app.route('/<path:re:[a-z0-9]{1,3}>/catalog')
 def render_catalog(path):
     """ Render board catalog into index.html """
     boards = select_boards()

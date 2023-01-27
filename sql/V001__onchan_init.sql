@@ -74,7 +74,6 @@ CREATE TABLE IF NOT EXISTS content(
 	created text DEFAULT current_timestamp,
 	board text NOT NULL,
 	thread_id INTEGER,
-	page INTEGER NOT NULL,
 	name text NOT NULL DEFAULT 'Anonymous', 
 	options text,
 	subject text,
