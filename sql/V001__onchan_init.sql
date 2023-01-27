@@ -162,6 +162,14 @@ BEGIN
 	DELETE FROM deletion_auth WHERE content_id = OLD.id;
 END;
 
+CREATE TRIGGER IF NOT EXISTS prune_children_trigger
+	AFTER DELETE ON content
+	WHEN OLD.thread_id IS NULL
+BEGIN
+	DELETE FROM deletion_auth WHERE content_id IN (SELECT id FROM content WHERE thread_id = OLD.id);
+	DELETE FROM content WHERE thread_id = OLD.id;
+END;
+
 CREATE TRIGGER IF NOT EXISTS decrement_replies_trigger
 	AFTER DELETE ON content
 	WHEN OLD.thread_id IS NOT NULL

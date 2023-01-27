@@ -138,7 +138,9 @@ def delete_images(ids, password_hash, db_file=config['db_name']):
     cur = conn.cursor()
     cur.execute(f'''DELETE FROM image 
                     WHERE content_id IN ({','.join(ids)}) 
-                    AND (SELECT password_hash FROM deletion_auth WHERE image_id IN ({','.join(ids)})) = \'{password_hash}\'''')
+                    AND (SELECT password_hash 
+                         FROM deletion_auth 
+                         WHERE content_id IN ({','.join(ids)})) = \'{password_hash}\'''')
     conn.commit()
     return cur.lastrowid
 
