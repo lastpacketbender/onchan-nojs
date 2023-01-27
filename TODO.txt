@@ -1,3 +1,6 @@
+VIRTUALIZATION
+    - Create Dockerfile
+
 CLEAN UP
     - Remove unused CSS/style
     - HTML/CSS validation
@@ -7,6 +10,11 @@ CLEAN UP
 DOCUMENTATION
     - Other error pages
     - User initiated deletion after X amount of time
+
+LOGGING
+    - OWASP loggin
+    - Role log file
+    - Configure log name/directory
 
 SECURITY
     DATA
@@ -28,6 +36,7 @@ DATA
     - Saging
     - Bump limit
     - Create queue for deletion of files
+    - Create ANSI SQL migrations for other DB/configuration
 
 COSMETIC FIXES
     - Remove old "quote" notation
@@ -65,14 +74,8 @@ FEATURES
 
 CONFIGURATION
     - Boards (path, description, name, special rules)
-        - path
-        - description
-        - name
         - posting functionality (nonoko by default)
-        - num posts
-        - num pages
         - special rules
-        - bump limit
 
 NICE TO HAVES
     - Save LATEST version for crypto
@@ -80,8 +83,6 @@ NICE TO HAVES
     - JS Additions
     - localstack for S3 replacement of public folder or CDN
     - SQL for other non SQLite databases (for sharding)
-    - test data insertion
     - Image DNA
     - Check for steganography
     - Watch words
-    - Verify image headers

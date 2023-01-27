@@ -204,6 +204,10 @@ def render_board_paged(path, page=1):
     resp = template('html/index.html', ctx=ctx)
     return resp
 
+@app.route('/<path:re:[a-z0-9]{1,3}>')
+def render_board(path, page=1):
+    redirect(f'/{path}/{page}')
+
 @app.route('/<path:re:[a-z0-9]{1,3}>/')
 def render_board(path, page=1):
     redirect(f'/{path}/{page}')
