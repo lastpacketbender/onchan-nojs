@@ -29,14 +29,12 @@ DATA
     - Bump limit
 
 COSMETIC FIXES
-    - Fix bottom and right padding of quotes
+    - Remove old "quote" notation
+    - Track replies to content for all types
 
 BUG FIXES
     - Strip submission
-    - Fix submission to board/thread resulting in the POST path.
-        - Can we just modify the response for another location?
-        - Pad info pages to be vertically middle and align the footer with the bottom of the page.
-        - Allow submission of only an image
+    - Allow submission of only an image
 
 FEATURES
     - Add (Dead) for IDs no longer existing
@@ -46,8 +44,6 @@ FEATURES
         - /4get/ (to obtain 4chan gets)
     - DB
         - Bump limit
-        - Pagination
-        - Delete  
         - SQL meta tables and stats
         - Indexes
         - Reporting
@@ -65,9 +61,6 @@ FEATURES
         - Sticky
         - Lock
     - Reporting
-    - Delete
-        - Post and image
-        - Image only
 
 CONFIGURATION
     - Boards (path, description, name, special rules)
