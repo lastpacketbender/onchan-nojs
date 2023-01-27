@@ -6,8 +6,8 @@
 
 All configuration is managed through [config.py](./config.py).
 
-```json
-{
+```python
+config = {
     "branding": "<name of your image board>",
     "attribution": "<owner/responsible party to be put in footer>",
     "images": {
