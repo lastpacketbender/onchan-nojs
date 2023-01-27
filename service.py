@@ -32,7 +32,8 @@ class TemplateContext:
                 content_info = 'html/components/content/content_info.html',
                 file_info = 'html/components/content/file_info.html',
                 thread_content = 'html/components/content/thread_content.html',
-                comment_line = 'html/components/content/comment_line.html'):  
+                comment_line = 'html/components/content/comment_line.html',
+                page = None):  
         self.board = board
         self.boards = boards
         self.thread = thread
@@ -52,6 +53,7 @@ class TemplateContext:
         self.message = message
         self.content = content
         self.error_title = error_title
+        self.page = page
 
 cookie_opts = {
     # Aylmao, 4chan keeps cookies for 1 year, we'll keep a month. 
@@ -186,8 +188,9 @@ def serve_static(filepath):
 
 ## BOARDS
 
-@app.route('/<path:re:[a-z0-9]{1,3}>/')
-def render_board(path, page=1):
+
+@app.route('/<path:re:[a-z0-9]{1,3}>/<page:int>')
+def render_board_paged(path, page=1):
     """ Render board into index.html """
     boards = select_boards()
     board = select_board(path, page)
@@ -197,24 +200,14 @@ def render_board(path, page=1):
             board=board,
             limit=5,
             reply=True,
-            page_title=get_title(path=path, name=board.name))
+            page_title=get_title(path=path, name=board.name),
+            page=page)
     resp = template('html/index.html', ctx=ctx)
     return resp
 
-@app.route('/<path:re:[a-z0-9]{1,3}>/<page:int>')
+@app.route('/<path:re:[a-z0-9]{1,3}>/')
 def render_board(path, page=1):
-    """ Render board into index.html """
-    boards = select_boards()
-    board = select_board(path, page)
-    ctx = TemplateContext(
-            content='html/pages/board.html', 
-            boards=boards,
-            board=board,
-            limit=5,
-            reply=True,
-            page_title=get_title(path=path, name=board.name))
-    resp = template('html/index.html', ctx=ctx)
-    return resp
+    redirect(f'/{path}/{page}')
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/delete', method='POST')
 def delete_from_board(path, page=1):
