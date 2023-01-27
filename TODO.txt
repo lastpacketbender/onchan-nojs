@@ -27,6 +27,7 @@ SECURITY
 DATA
     - Saging
     - Bump limit
+    - Create queue for deletion of files
 
 COSMETIC FIXES
     - Remove old "quote" notation

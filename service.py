@@ -249,14 +249,14 @@ def render_thread(path, thread):
     boards = select_boards()
     board = next(filter(lambda b: f"/{path}/" == b.path, boards))
     thread = select_thread(path, thread, limit=100)
-    ctx = TemplateContext(
-        content='html/pages/thread.html',
-        boards=boards,
-        board=board,
-        thread=thread,
-        limit=100,
-        page_title=get_title(path=path, name=board.name, subject=thread.subject[:30]))
     if thread:
+        ctx = TemplateContext(
+            content='html/pages/thread.html',
+            boards=boards,
+            board=board,
+            thread=thread,
+            limit=100,
+            page_title=get_title(path=path, name=board.name, subject=thread.subject[:30]))
         resp = template('html/index.html', ctx=ctx)
         return resp
     else:
@@ -387,6 +387,24 @@ def faq():
         boards=boards, 
         page_title=get_title(extra='FAQ'))
     return template('html/index.html', ctx=ctx)
+
+print("Checking/applying DB migrations...")
+migrate()
+
+# Configuration setup
+print("Reading configuration and setting up boards...")
+boards = select_boards()
+for board in config['boards']:
+    if not select_board(board['path'].replace('/', ''), 1):
+        print(f"Creating board {board['path']}")
+        b = Board(
+            board['path'], 
+            board['name'], 
+            board['description'], 
+            board['thread_limit'], 
+            board['image_limit'], 
+            board['bump_limit'])
+        insert_board(b)
 
 app.run(
     host=config['server']['host'], 

@@ -33,40 +33,10 @@ CREATE TABLE IF NOT EXISTS board(
 	path text PRIMARY KEY NOT NULL,
 	name text UNIQUE NOT NULL,
 	description text,
+	thread_limit INTEGER NOT NULL DEFAULT 100,
+	image_limit INTEGER NOT NULL DEFAULT 50,
+	bump_limit INTEGER NOT NULL DEFAULT 100,
 	UNIQUE(name)
-);
-
-INSERT OR IGNORE INTO board(path, name, description)
-VALUES
-(
-	'/b/',
-	'Random',
-	'Don''t do it.'
-),
-(
-	'/g/',
-	'Technology',
-	'Your choice of Emacs has me quite discheesed.'
-),
-(
-	'/lit/',
-	'Literature',
-	'This place is /lit/'
-),
-(
-	'/sci/',
-	'Science & Math',
-	'Most research is tripe, this board is no different'
-),
-(
-	'/t/', 
-	'Torrents', 
-	'You wouldn''t download a car, would you anon?'
-),
-(
-	'/x/',
-	'Paranormal',
-	'Meds, anon.'
 );
 
 CREATE TABLE IF NOT EXISTS content(
@@ -130,9 +100,10 @@ CREATE TABLE IF NOT EXISTS deletion_auth(
 --- 
 -- TODO: Track version/see if this migration file can be hashed
 CREATE TABLE IF NOT EXISTS migration(
-	id INTEGER PRIMARY KEY ASC,
+	version INTEGER PRIMARY KEY ASC,
 	name text NOT NULL,
-	UNIQUE(name)
+	hash text NOT NULL,
+	UNIQUE(name, hash)
 );
 
 -- Maintain counts for replies
@@ -206,5 +177,3 @@ BEGIN
 						WHERE board = NEW.board 
 						AND thread_id IS NULL);
 END;
-
-INSERT OR IGNORE INTO migration(name) VALUES ('V001__onchan_init.sql');

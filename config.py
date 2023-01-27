@@ -5,7 +5,10 @@ config = {
     "images": {
         "dir": "./public/img"
     },
-    "db_name": "onchan.db",
+    "data": {
+        "db_name": "onchan.db",
+        "migration_dir": "./sql/migration",
+    },
     "server": {
         "debug": True,
         "reload": True,
@@ -61,7 +64,49 @@ Catch me schizoposting in >>>/x/.
         "key": "lolololololololololololololololololololololololololololololololololololololololololololololololol",
         "name": "onchan_pass",
         "max_age": 3600 * 24 * 30
-    }
+    },
+    "boards": [
+        {
+            "path": "/b/",
+            "name": "Random",
+            "description": "Don''t do it.",
+            "bump_limit": 100,
+            "image_limit": 50,
+            "thread_limit": 100
+        },
+        {
+            "path": "/g/",
+            "name": "Technology",
+            "description": "Your choice of Emacs has me quite discheesed.",
+            "bump_limit": 100,
+            "image_limit": 50,
+            "thread_limit": 100
+        },
+        {
+            "path": "/sci/",
+            "name": "Science & Math",
+            "description": "Most research is tripe, this board is no different.",
+            "bump_limit": 100,
+            "image_limit": 50,
+            "thread_limit": 100
+        },
+        {
+            "path": "/t/",
+            "name": "Torrents",
+            "description": "You wouldn't download a car, would you anon?",
+            "bump_limit": 100,
+            "image_limit": 50,
+            "thread_limit": 100
+        },
+        {
+            "path": "/x/",
+            "name": "Paranormal",
+            "description": "Meds, anon.",
+            "bump_limit": 100,
+            "image_limit": 50,
+            "thread_limit": 100
+        }
+    ]
     # The current configuration is:
     #
     #  - public/ for image storage
