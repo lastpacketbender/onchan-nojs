@@ -85,7 +85,6 @@ CREATE TABLE IF NOT EXISTS content(
 		ON DELETE CASCADE,
 	FOREIGN KEY(board) REFERENCES board(path) 
 		ON DELETE CASCADE
-	-- UNIQUE(comment)
 );
 
 CREATE TABLE IF NOT EXISTS image(
@@ -146,10 +145,19 @@ BEGIN
 	WHERE content.id = NEW.thread_id;
 END;
 
+CREATE TRIGGER IF NOT EXISTS prune_content_image_and_auth_trigger
+	AFTER DELETE ON content
+	WHEN (SELECT COUNT(id) FROM image WHERE content_id = OLD.id)
+BEGIN
+	DELETE FROM image WHERE content_id = OLD.id;
+	DELETE FROM deletion_auth WHERE content_id = OLD.id;
+END;
+
 CREATE TRIGGER IF NOT EXISTS decrement_replies_trigger
 	AFTER DELETE ON content
 	WHEN OLD.thread_id IS NOT NULL
 BEGIN
+	-- count should be taken care of in decrement_images_trigger
 	UPDATE content SET replies = replies - 1
 	WHERE content.id = OLD.thread_id;
 END;
@@ -164,26 +172,26 @@ BEGIN
  	WHERE content.id = NEW.thread_id;
 END;
 
-CREATE TRIGGER IF NOT EXISTS decrement_images_trigger
+CREATE TRIGGER IF NOT EXISTS decrement_image_replies_trigger
 	AFTER DELETE ON image
-	WHEN OLD.thread_id IS NOT NULL
 BEGIN
-	UPDATE content SET replies = replies - 1
+	UPDATE content 
+	SET image_replies = image_replies - 1
 	WHERE content.id = OLD.thread_id;
 END;
 
 -- Roll threads past 100 for each board after insertion
 CREATE TRIGGER IF NOT EXISTS roll_threads_trigger
 	BEFORE INSERT ON content
-	WHEN (SELECT
-			CASE WHEN COUNT(*) >= 100 
-			THEN 1 
-			ELSE 0 
-			END 
-		  FROM (SELECT id 
-				FROM content 
-				WHERE board = NEW.board 
-				AND thread_id IS NULL))
+	WHEN NEW.thread_id IS NULL 
+	AND (SELECT CASE WHEN COUNT(*) >= 100 
+				THEN 1 
+				ELSE 0 
+				END 
+		FROM (SELECT id 
+			FROM content 
+			WHERE board = NEW.board 
+			AND thread_id IS NULL))
 BEGIN
 	DELETE FROM content
 	WHERE created = (SELECT MIN(created) 

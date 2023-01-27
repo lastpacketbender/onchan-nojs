@@ -291,8 +291,6 @@ def upload_thread(path, thread):
             password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for _ in range(32)])
             password_hash = ph.hash(password)
             response.set_cookie(config['cookies']['name'], password_hash, secret=config['cookies']['key'], **cookie_opts)
-        else:
-            print("Existing hash", password_hash)
         if data.filename != 'empty':
             content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, thread=thread)
         else:

@@ -89,7 +89,6 @@ def create_connection(db_file=config['db_name']):
     return conn
 
 def insert_image(img, thread, db_file=config['db_name']):
-    print(img.content_id)
     if img:
         conn = create_connection(db_file)
         cur = conn.cursor()
@@ -127,7 +126,6 @@ def insert_content(content, db_file=config['db_name']):
     return cur.lastrowid
 
 def insert_deletion_auth(content_id, password_hash, image_id=None, db_file=config['db_name']):
-    print(">>>>>>INSERT_DELETION_AUTH", password_hash, content_id, image_id)
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''INSERT INTO deletion_auth(content_id, image_id, password_hash)
@@ -148,7 +146,6 @@ def delete_images(ids, password_hash, db_file=config['db_name']):
     return cur.lastrowid
 
 def delete_contents(ids, password_hash, db_file=config['db_name']):
-    print(ids, password_hash)
     conn = create_connection(db_file)
     cur = conn.cursor()
     cur.execute(f'''DELETE FROM content 
