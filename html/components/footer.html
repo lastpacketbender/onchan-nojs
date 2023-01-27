@@ -1,3 +1,5 @@
+%from data import count_threads
+
 <footer style="display: block;" id="bottom">
     %if ctx.board or ctx.thread:
         <div>
@@ -8,7 +10,8 @@
                     <a href="{{ctx.page - 1 if ctx.page else ctx.page}}"><button type="button" >&lt;</button></a>
                 %end
                 <small>[
-                    %for i in range(1, 11):
+                    <!-- Integer division, exclusive range requires + 2 -->
+                    %for i in range(1, (count_threads(ctx.board.path) // 10) + 2):
                         <strong><a href="{{i}}">{{i}}</a></strong>
                     %end
                 ]</small>

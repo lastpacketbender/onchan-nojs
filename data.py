@@ -220,6 +220,12 @@ def select_quotes(thread, limit=100, db_file=config['db_name']):
         quotes.append(Content(id=id, board=board, thread_id=thread_id, page=page, name=name, options=options, subject=subject, comment=comment, img=img))
     return quotes
 
+def count_threads(path, db_file=config['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    cur.execute(f'''SELECT COUNT(*) FROM content WHERE thread_id IS NULL''')
+    rows = cur.fetchall()
+    return rows[0][0]
 
 def select_threads(path, page, limit=100, db_file=config['db_name']):
     conn = create_connection(db_file)
