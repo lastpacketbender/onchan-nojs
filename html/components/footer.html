@@ -12,7 +12,7 @@
                         <strong><a href="{{i}}">{{i}}</a></strong>
                     %end
                 ]</small>
-                %if not ctx.page or ctx.page < 10:
+                %if not ctx.page or ctx.page < 10 and len(ctx.board.threads) == 10:
                     <a href="{{ctx.page + 1 if ctx.page else 2}}"><button type="button" >&gt;</button></a>
                 %else:
                     <button type="button" disabled>&gt;</button>

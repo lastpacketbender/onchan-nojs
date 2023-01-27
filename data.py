@@ -228,9 +228,8 @@ def select_threads(path, page, limit=100, db_file=config['db_name']):
                     LEFT JOIN image ON content.id = image.content_id 
                     WHERE content.thread_id IS NULL 
                     AND content.board = ? 
-                    AND content.page = ?
                     ORDER BY created DESC 
-                    LIMIT ?''', (f"/{path}/", page, limit))
+                    LIMIT ? OFFSET ?''', (f"/{path}/", limit, (page - 1) * 10))
     rows = cur.fetchall()
     threads = []
     for row in rows:
