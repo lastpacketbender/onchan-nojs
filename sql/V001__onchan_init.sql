@@ -144,6 +144,16 @@ BEGIN
 	WHERE content.id = NEW.thread_id;
 END;
 
+-- Maintain counts for image replies
+CREATE TRIGGER IF NOT EXISTS image_omission_trigger
+   	BEFORE INSERT ON image
+   	WHEN NEW.thread_id NOT NULL
+BEGIN
+ 	UPDATE content 
+ 	SET image_replies = image_replies + 1
+ 	WHERE content.id = NEW.thread_id;
+END;
+
 CREATE TRIGGER IF NOT EXISTS prune_content_image_and_auth_trigger
 	AFTER DELETE ON content
 	WHEN (SELECT COUNT(id) FROM image WHERE content_id = OLD.id)
@@ -159,16 +169,6 @@ BEGIN
 	-- count should be taken care of in decrement_images_trigger
 	UPDATE content SET replies = replies - 1
 	WHERE content.id = OLD.thread_id;
-END;
-
--- Maintain counts for image replies
-CREATE TRIGGER IF NOT EXISTS image_omission_trigger
-   	BEFORE INSERT ON image
-   	WHEN NEW.thread_id NOT NULL
-BEGIN
- 	UPDATE content 
- 	SET image_replies = image_replies + 1
- 	WHERE content.id = NEW.thread_id;
 END;
 
 CREATE TRIGGER IF NOT EXISTS decrement_image_replies_trigger

@@ -127,8 +127,7 @@ def save_comment_and_file(path, data, name, options, comment, password_hash, thr
             url=f"{config['images']['dir']}/{filename}",
             checksum=digest,
             # TODO: Get latest by query
-            version=1
-        )
+            version=1)
         # empty tuple val is delayed auth_id for inserting in next line as a pair
         image_id = insert_image(img, thread)
         auth_id = insert_deletion_auth(content_id, password_hash, image_id=image_id)
@@ -218,10 +217,8 @@ def delete_from_board(path, page=1):
     if password_hash:
         if 'delete-file-only' in on:
             delete_images(ids, password_hash)
-            print(">>>> DELETING FILE ONLY", ids)
         else:
             delete_contents(ids, password_hash)
-            print(">>>> DELETING CONTENTS", ids)
     return redirect(f"/{path}/")
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/upload', method='POST')
@@ -261,9 +258,6 @@ def render_thread(path, thread):
         page_title=get_title(path=path, name=board.name, subject=thread.subject[:30]))
     if thread:
         resp = template('html/index.html', ctx=ctx)
-        if cookie:
-            password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for x in range(32)])
-            response.set_cookie(config['cookies']['name'], password, secret=config['cookies']['key'], **cookie_opts)
         return resp
     else:
         return not_found(None)
@@ -277,11 +271,9 @@ def delete_from_thread(path, thread):
     if password_hash:
         if 'delete-file-only' in on:
             delete_images(ids, password_hash)
-            print(">>>> DELETING FILE ONLY", ids)
         else:
             delete_contents(ids, password_hash)
-            print(">>>> DELETING CONTENTS", ids)
-    return redirect(f"/{path}/")
+    return redirect(f"/{path}/thread/{thread}") if thread not in ids else redirect(f"/{path}/")
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
 def upload_thread(path, thread):

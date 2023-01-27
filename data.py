@@ -33,7 +33,6 @@ class Content:
                  id=None,
                  board=None,
                  thread_id=None,
-                 page=1,
                  name=None,
                  subject=None,
                  comment=None, 
@@ -46,7 +45,6 @@ class Content:
         self.created = datetime.now()
         self.board = board
         self.thread_id = thread_id
-        self.page = page
         self.name = name
         self.subject = subject
         self.comment = comment
@@ -112,12 +110,11 @@ def insert_image(img, thread, db_file=config['db_name']):
 def insert_content(content, db_file=config['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
-    cur.execute(f'''INSERT INTO content(created, board, thread_id, page, name, options, subject, comment)
-                   VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', (
+    cur.execute(f'''INSERT INTO content(created, board, thread_id, name, options, subject, comment)
+                   VALUES(?, ?, ?, ?, ?, ?, ?)''', (
                         content.created,
                         content.board, 
                         content.thread_id, 
-                        content.page,
                         content.name,
                         content.options,
                         content.subject,
@@ -205,7 +202,7 @@ def select_quotes(thread, limit=100, db_file=config['db_name']):
     rows = cur.fetchall()
     quotes = []
     for row in rows:
-        (id, created, board, thread_id, page, name, options, subject, comment, _, _,
+        (id, created, board, thread_id, name, options, subject, comment, _, _,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -217,7 +214,7 @@ def select_quotes(thread, limit=100, db_file=config['db_name']):
                  url=url,
                  checksum=checksum,
                  version=version)
-        quotes.append(Content(id=id, board=board, thread_id=thread_id, page=page, name=name, options=options, subject=subject, comment=comment, img=img))
+        quotes.append(Content(id=id, board=board, thread_id=thread_id, name=name, options=options, subject=subject, comment=comment, img=img))
     return quotes
 
 def count_threads(path, db_file=config['db_name']):
@@ -239,7 +236,7 @@ def select_threads(path, page, limit=100, db_file=config['db_name']):
     rows = cur.fetchall()
     threads = []
     for row in rows:
-        (id, created, board, thread_id, page, name, options, subject, comment, replies, image_replies,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies,
         img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -256,7 +253,6 @@ def select_threads(path, page, limit=100, db_file=config['db_name']):
             id=id, 
             board=board, 
             thread_id=thread_id, 
-            page=page, 
             name=name, 
             options=options,
             subject=subject, 
@@ -280,7 +276,7 @@ def select_thread(path, id, limit=100, db_file=config['db_name']):
     rows = cur.fetchall()
     
     for row in rows:
-        (id, created, board, thread_id, page, name, options, subject, comment, _, _,
+        (id, created, board, thread_id, name, options, subject, comment, _, _,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -294,4 +290,4 @@ def select_thread(path, id, limit=100, db_file=config['db_name']):
                  version=version,
                  thread_id=thread_id)
         quotes = select_quotes(id, limit=100)
-        return Content(id=id, board=board, thread_id=thread_id, page=page, name=name, options=options, subject=subject, comment=comment, img=img, quotes=quotes)
+        return Content(id=id, board=board, thread_id=thread_id, name=name, options=options, subject=subject, comment=comment, img=img, quotes=quotes)
