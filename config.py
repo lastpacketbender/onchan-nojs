@@ -2,7 +2,6 @@
 config = {
     "branding": "onchan",
     "attribution": "Max Headroom",
-    "disclaimer": "Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.",
     "images": {
         "dir": "./public/img"
     },
