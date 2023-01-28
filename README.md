@@ -15,7 +15,8 @@ config = {
     },
     "data": {
         "db_name": "<name of SQLite DB file>.db",
-        "migration_dir": "<name of directory with SQL migrations>"
+        "migration_dir": "<name of directory with SQL migrations>",
+        "purge_delay": 30
     },
     "server": {
         "debug": True,
@@ -64,10 +65,14 @@ config = {
 ## Running
 
 ```bash
-$ ./scripts/migrate.sh # Create initial schema/apply migrations from sql/
 $ source venv/bin/activate
 $ python3 service.py
 ```
+
+## Scripts
+
+* [scripts/destroy.sh](./scripts/destroy.sh) - destroy database and remove public/img
+* [scripts/migrate.sh](./scripts/migrate.sh) - now defunct due to migrations being handled at startup
 
 ## Why?
 
