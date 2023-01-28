@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode, cookie_decode
 import html, re, os, cgi, random, enum, hashlib, calendar, string, secrets
 from datetime import datetime
 
+from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode, cookie_decode
 from argon2 import PasswordHasher
 
 from data import *
@@ -11,6 +11,7 @@ from util import save_image, image_dimensions
 from log import log_to_logger
 from config import config
 from validations import *
+from tasks import BackgroundFilePurge
 
 class TemplateContext:
     def __init__(self,
@@ -156,7 +157,7 @@ def your_bad(err):
             boards=boards,
             page_title=get_title(extra="400: Bad request"),
             error_title="Bad request",
-            message="Your bad, if a validation error - email me")
+            message=err if err else "Your bad, if a validation error - email me")
     return template(
         'html/index.html', 
         ctx=ctx)
@@ -209,7 +210,7 @@ def render_board(path, page=1):
     redirect(f'/{path}/{page}')
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/')
-def render_board(path, page=1):
+def render_board_(path, page=1):
     redirect(f'/{path}/{page}')
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/delete', method='POST')
@@ -285,7 +286,7 @@ def upload_thread(path, thread):
     options = request.forms.get('options')
     comment = request.forms.get('comment')
     data = request.files.get("file", "")
-    valid_reply, message = validate_new_reply(name, options, comment, data)
+    valid_reply, message = validate_new_reply(name, options, comment, data, path, thread)
     if valid_reply:
         password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
         if not password_hash:
@@ -299,7 +300,7 @@ def upload_thread(path, thread):
             content_id, auth_id = save_comment(path, name, options, comment, thread=thread, password_hash=password_hash)
         return redirect(f"/{path}/thread/{thread}")
     else:
-        return your_bad(None)
+        return your_bad(message)
  
 @app.route('/<path:re:[a-z0-9]{1,3}>/catalog')
 def render_catalog(path):
@@ -410,8 +411,11 @@ for board in config['boards']:
             board['bump_limit'])
         insert_board(b)
 
+t = BackgroundFilePurge()
+t.start()
 app.run(
     host=config['server']['host'], 
     port=config['server']['port'], 
     debug=config['server']['debug'], 
     reloader=config['server']['reload'])
+t.join()

@@ -8,10 +8,11 @@ config = {
     "data": {
         "db_name": "onchan.db",
         "migration_dir": "./sql/migration",
+        "purge_delay": 30,
     },
     "server": {
-        "debug": True,
-        "reload": True,
+        "debug": False,
+        "reload": False,
         "port": 8080,
         "host": "localhost"
     },

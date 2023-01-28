@@ -216,6 +216,14 @@ def insert_deletion_auth(content_id, password_hash, image_id=None, db_file=confi
     conn.close()
     return cur.lastrowid
 
+def select_images(ids, db_file=config['data']['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    cur.execute(f'''SELECT url FROM image WHERE id IN ({','.join(ids)})''')
+    rows = cur.fetchall()
+    conn.close()
+    return [i[0] for i in rows]
+
 def delete_images(ids, password_hash, db_file=config['data']['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
@@ -226,6 +234,13 @@ def delete_images(ids, password_hash, db_file=config['data']['db_name']):
                          WHERE content_id IN ({','.join(ids)})) = \'{password_hash}\'''')
     conn.commit()
     conn.close()
+    for url in select_images(ids):
+        if os.path.isfile(image):
+            os.remove(image)
+            print("%s purged" % image)
+        else:
+            # If it fails, inform the user.
+            print("%s file not found for removal, skipping..." % image)
     return cur.lastrowid
 
 def delete_contents(ids, password_hash, db_file=config['data']['db_name']):
@@ -369,7 +384,7 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
     rows = cur.fetchall()
     conn.close()
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, _, _,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -383,4 +398,39 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
                  version=version,
                  thread_id=thread_id)
         quotes = select_quotes(id, limit=100)
-        return Content(id=id, board=board, thread_id=thread_id, name=name, options=options, subject=subject, comment=comment, img=img, quotes=quotes)
+        return Content(id=id, 
+                        board=board, 
+                        thread_id=thread_id, 
+                        name=name, 
+                        options=options, 
+                        subject=subject, 
+                        comment=comment, 
+                        img=img, 
+                        quotes=quotes,
+                        replies=replies,
+                        image_replies=image_replies)
+
+def count_image_removal_queue(db_file=config['data']['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    cur.execute(f'''SELECT COUNT(*) FROM image_removal_queue''')
+    rows = cur.fetchall()
+    conn.close()
+    return rows[0][0]
+
+def select_image_removal_queue(db_file=config['data']['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    # TODO: Don't need this many conditions
+    cur.execute(f'''SELECT * FROM image_removal_queue''')
+    rows = cur.fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+def clear_image_removal_queue(db_file=config['data']['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    # TODO: Don't need this many conditions
+    cur.execute(f'''DELETE FROM image_removal_queue''')
+    conn.commit()
+    conn.close()

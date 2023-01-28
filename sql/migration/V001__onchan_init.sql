@@ -1,5 +1,13 @@
 PRAGMA foreign_keys = ON;
 
+CREATE TABLE IF NOT EXISTS migration(
+	version INTEGER PRIMARY KEY ASC,
+	name text NOT NULL,
+	hash text NOT NULL,
+	UNIQUE(name, hash)
+);
+
+-- Versioned crypto for algorithm changes
 CREATE TABLE IF NOT EXISTS crypto(
 	id INTEGER PRIMARY KEY ASC,
 	name text KEY NOT NULL,
@@ -9,9 +17,6 @@ CREATE TABLE IF NOT EXISTS crypto(
 	UNIQUE(name)
 );
 
--- Version control for future crypto migrations, not that these should change soon
---  - file_checksum is obviously for files
---  - hash_password is for trip codes, argon2i is slow to break if a table gets dumped
 INSERT OR IGNORE INTO crypto(id, name, version, algo, bits) 
 VALUES 
 (
@@ -88,22 +93,8 @@ CREATE TABLE IF NOT EXISTS deletion_auth(
 		ON DELETE CASCADE
 );
 
--- Table to track database migrations versions, these include:
--- 
---- schema changes
---- stored procedure additions/deletions/modifications
---- configuration data
---- admin controlled data such as boards, configurations, site information updates
----		- it's fine to read these in from a config file, but live changes 
----     - are better than dark-deploying an instance and swapping DNS with
----     - teardown of the old.
---- 
--- TODO: Track version/see if this migration file can be hashed
-CREATE TABLE IF NOT EXISTS migration(
-	version INTEGER PRIMARY KEY ASC,
-	name text NOT NULL,
-	hash text NOT NULL,
-	UNIQUE(name, hash)
+CREATE TABLE IF NOT EXISTS image_removal_queue(
+	path TEXT PRIMARY KEY NOT NULL
 );
 
 -- Maintain counts for replies
@@ -156,13 +147,16 @@ BEGIN
 	UPDATE content 
 	SET image_replies = image_replies - 1
 	WHERE content.id = OLD.thread_id;
+	INSERT INTO image_removal_queue(path) VALUES (OLD.url);
 END;
 
--- Roll threads past 100 for each board after insertion
+-- Roll threads when thread_limit is exceeded
 CREATE TRIGGER IF NOT EXISTS roll_threads_trigger
 	BEFORE INSERT ON content
 	WHEN NEW.thread_id IS NULL 
-	AND (SELECT CASE WHEN COUNT(*) >= 100 
+	AND (SELECT CASE WHEN COUNT(*) >= (SELECT thread_limit 
+									  FROM board 
+									  WHERE board.path = NEW.board) 
 				THEN 1 
 				ELSE 0 
 				END 
