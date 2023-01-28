@@ -36,7 +36,6 @@ DATA
     - Transactions
     - Saging
     - Bump limit
-    - Create queue for deletion of files
     - Create ANSI SQL migrations for other DB/configuration
 
 COSMETIC FIXES
