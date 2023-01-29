@@ -1,0 +1,7 @@
+argon2-cffi==21.3.0
+argon2-cffi-bindings==21.2.0
+bottle==0.12.23
+cffi==1.15.1
+pycparser==2.21
+python-dateutil==2.8.2
+six==1.16.0

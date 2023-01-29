@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import html, re, os, cgi, random, enum, hashlib, calendar, string, secrets
+import html, re, os, random, enum, hashlib, calendar, string, secrets
 from datetime import datetime
 
 from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode, cookie_decode

@@ -14,7 +14,7 @@ config = {
         "debug": False,
         "reload": False,
         "port": 8080,
-        "host": "localhost"
+        "host": "0.0.0.0"
     },
     "info": {
         "disclaimer": "Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.",
