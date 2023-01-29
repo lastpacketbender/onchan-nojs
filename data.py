@@ -40,7 +40,8 @@ class Content:
                  img=None,
                  replies=None,
                  image_replies=None,
-                 quotes=[]):
+                 quotes=[],
+                 sage=0):
         self.id = id
         self.created = datetime.utcnow()
         self.board = board
@@ -53,6 +54,7 @@ class Content:
         self.quotes = quotes
         self.replies = replies
         self.image_replies = image_replies
+        self.sage = sage
         
 
 class Board:
@@ -308,7 +310,7 @@ def select_quotes(thread, limit=100, db_file=config['data']['db_name']):
     conn.close()
     quotes = []
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, _, _, _,
+        (id, created, board, thread_id, name, options, subject, comment, _, _, _, _,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -348,7 +350,7 @@ def select_threads(path, page, limit=100, db_file=config['data']['db_name']):
     conn.close()
     threads = []
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at, sage,
         img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -372,7 +374,8 @@ def select_threads(path, page, limit=100, db_file=config['data']['db_name']):
             img=img, 
             quotes=quotes,
             replies=replies,
-            image_replies=image_replies)
+            image_replies=image_replies,
+            sage=sage)
         threads.append(content)
     return threads
 
@@ -388,7 +391,7 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
     rows = cur.fetchall()
     conn.close()
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at, sage,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -412,7 +415,8 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
                         img=img, 
                         quotes=quotes,
                         replies=replies,
-                        image_replies=image_replies)
+                        image_replies=image_replies,
+                        sage=sage)
 
 def count_image_removal_queue(db_file=config['data']['db_name']):
     conn = create_connection(db_file)
@@ -436,5 +440,13 @@ def clear_image_removal_queue(db_file=config['data']['db_name']):
     cur = conn.cursor()
     # TODO: Don't need this many conditions
     cur.execute(f'''DELETE FROM image_removal_queue''')
+    conn.commit()
+    conn.close()
+
+def sage_thread(id, db_file=config['data']['db_name']):
+    conn = create_connection(db_file)
+    cur = conn.cursor()
+    # TODO: Don't need this many conditions
+    cur.execute(f'''UPDATE content SET sage = sage + 1 WHERE id = ?''', (id,))
     conn.commit()
     conn.close()

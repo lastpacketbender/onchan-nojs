@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS content(
 	replies INTEGER DEFAULT 0,
 	image_replies INTEGER DEFAULT 0,
 	limited_at DATETIME,
+	sage INTEGER DEFAULT 0,
 	FOREIGN KEY(thread_id) REFERENCES content(content_id)
 		ON DELETE CASCADE,
 	FOREIGN KEY(board) REFERENCES board(path) 
@@ -114,7 +115,7 @@ BEGIN
  	UPDATE content
 	SET replies = replies + 1,
 		limited_at = CASE
-					 WHEN content.limited_at IS NULL AND replies = (SELECT bump_limit FROM board WHERE path = NEW.board) - 1
+					 WHEN content.limited_at IS NULL AND replies + sage = (SELECT bump_limit FROM board WHERE path = NEW.board) - 1
 					 THEN current_timestamp 
 					 ELSE content.limited_at
 					 END

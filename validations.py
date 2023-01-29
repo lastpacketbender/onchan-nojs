@@ -25,6 +25,28 @@ def validate_file(data):
         messages.append("image required")
     return True if len(messages) == 0 else False, messages
 
+def validate_options(options):
+    messages = []
+    options = options.split(" ")
+    valid_options = True
+    if len(options) == 1 and options[0] != '':
+        for option in options:
+            if option == "sage":
+                print("TODO: Bump sage, add to query")
+            elif option == "nonoko":
+                print("TODO: Old posting functionality")
+            elif "##" in option:
+                name, password = option.split("##")
+                print("TODO: Secure trip code")
+            elif "#" in option:
+                name, password = option.split("#")
+                print("TODO: Trip code")
+            else:
+                messages.append(f"invalid option '{option}' found")
+                valid_options = False
+    print(options, valid_options)
+    return valid_options, messages, options if len(messages) == 0 else None
+
 def validate_comment(comment):
     messages = []
     if len(comment) > 2000:
@@ -37,8 +59,10 @@ def validate_new_thread(name, subject, options, comment, data):
     
     # if not name: Defaulted in database
     valid_comment, comment_messages = validate_comment(comment)
+
+    valid_options, options_messages, options = validate_options(options)
     
-    return valid_comment and valid_file, ', '.join(file_messages + comment_messages)
+    return valid_comment and valid_file and valid_options, ', '.join(file_messages + comment_messages + options_messages), options
 
 def validate_new_reply(name, options, comment, data, path, thread):
     # TODO: length of name, subject, options
@@ -56,6 +80,7 @@ def validate_new_reply(name, options, comment, data, path, thread):
     
     # if not name: Defaulted in database
     valid_comment, comment_messages = validate_comment(comment)
+    valid_options, options_messages, options = validate_options(options)
     
-    return valid_comment and valid_file, ', '.join(file_messages + comment_messages)
+    return valid_comment and valid_file and valid_options, ', '.join(file_messages + comment_messages + options_messages), options
 

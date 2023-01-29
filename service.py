@@ -91,7 +91,7 @@ def save_comment(path, name, options, comment, password_hash=None, thread=None, 
             board=f"/{path}/", 
             thread_id=thread,
             name=name, 
-            options=options,
+            options=''.join(options),
             subject=subject,
             comment=comment)
     # empty var from tuple is delayed auth_id for inserting in next line as a pair
@@ -232,7 +232,7 @@ def upload(path):
     options = request.forms.get('options').strip()
     comment = request.forms.get('comment').strip()
     data = request.files.get("file", "")
-    valid_thread, message = validate_new_thread(name, subject, options, comment, data)   
+    valid_thread, message, options = validate_new_thread(name, subject, options, comment, data)   
     if valid_thread:
         password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
         if not password_hash:
@@ -240,7 +240,9 @@ def upload(path):
             password = ''.join([secrets.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation) for _ in range(32)])
             password_hash = ph.hash(password)
             response.set_cookie(config['cookies']['name'], password_hash, secret=config['cookies']['key'], **cookie_opts)
-        content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, subject=subject)
+        content_id, image_id, auth_id = save_comment_and_file(path, data, name, ''.join(options), comment, password_hash, subject=subject)
+        if "nonoko" in options:
+            print("TODO: nonoko in /board/upload")
         return redirect(f"/{path}/")
     else:
         return your_bad(None)
@@ -285,7 +287,7 @@ def upload_thread(path, thread):
     options = request.forms.get('options').strip()
     comment = request.forms.get('comment').strip()
     data = request.files.get("file", "")
-    valid_reply, message = validate_new_reply(name, options, comment, data, path, thread)
+    valid_reply, message, options = validate_new_reply(name, options, comment, data, path, thread)
     if valid_reply:
         password_hash = request.get_cookie(config['cookies']['name'], secret=config['cookies']['key'])
         if not password_hash:
@@ -297,6 +299,11 @@ def upload_thread(path, thread):
             content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, thread=thread)
         else:
             content_id, auth_id = save_comment(path, name, options, comment, thread=thread, password_hash=password_hash)
+        if "nonoko" in options:
+            print("TODO: nonoko in /thread/id/upload")
+        elif "sage" in options:
+            sage_thread(thread)
+            print("TODO: sage in /thread/id/upload")
         return redirect(f"/{path}/thread/{thread}")
     else:
         return your_bad(message)

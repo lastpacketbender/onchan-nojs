@@ -32,16 +32,12 @@ SECURITY
 DATA
     - Transactions
     - Saging
-    - Bump limit
     - Create ANSI SQL migrations for other DB/configuration
     - Migrate to sProcs
 
 COSMETIC FIXES
     - Remove old "quote" notation from html
     - Track replies to content for all types via >> in comments
-
-BUG FIXES
-    - Strip submission
 
 FEATURES
     - Add (Dead) for IDs no longer existing
@@ -50,7 +46,6 @@ FEATURES
         - FAILGETs WINGETs
         - /4get/ (to obtain 4chan gets)
     - DB
-        - Bump limit
         - SQL meta tables and stats
         - Reporting
     - Options
