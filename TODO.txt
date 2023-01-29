@@ -31,7 +31,6 @@ SECURITY
 
 DATA
     - Transactions
-    - Saging
     - Create ANSI SQL migrations for other DB/configuration
     - Migrate to sProcs
 
@@ -49,7 +48,6 @@ FEATURES
         - SQL meta tables and stats
         - Reporting
     - Options
-        - sage (don't bump thread)
         - nonoko (use old posting functionality)
         - nonoko + sage
         - Trip codes
