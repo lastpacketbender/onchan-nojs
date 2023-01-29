@@ -12,9 +12,9 @@ config = {
     },
     "server": {
         "debug": False,
-        "reload": False,
+        "reload": True,
         "port": 8080,
-        "host": "0.0.0.0"
+        "host": "localhost"
     },
     "info": {
         "disclaimer": "Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.",

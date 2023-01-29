@@ -16,7 +16,7 @@ class Image:
                  version=-1,
                  thread_id=-1):
         self.id = id
-        self.created = datetime.now()
+        self.created = datetime.utcnow()
         self.content_id = content_id
         self.filename = filename
         self.orig_filename = orig_filename
@@ -42,7 +42,7 @@ class Content:
                  image_replies=None,
                  quotes=[]):
         self.id = id
-        self.created = datetime.now()
+        self.created = datetime.utcnow()
         self.board = board
         self.thread_id = thread_id
         self.name = name
@@ -308,7 +308,7 @@ def select_quotes(thread, limit=100, db_file=config['data']['db_name']):
     conn.close()
     quotes = []
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, _, _,
+        (id, created, board, thread_id, name, options, subject, comment, _, _, _,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -326,7 +326,7 @@ def select_quotes(thread, limit=100, db_file=config['data']['db_name']):
 def count_threads(path, db_file=config['data']['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
-    cur.execute(f'''SELECT COUNT(*) FROM content WHERE thread_id IS NULL''')
+    cur.execute(f'''SELECT COUNT(*) FROM content WHERE thread_id IS NULL AND board = ?''', (path,))
     rows = cur.fetchall()
     conn.close()
     return rows[0][0]
@@ -334,17 +334,21 @@ def count_threads(path, db_file=config['data']['db_name']):
 def select_threads(path, page, limit=100, db_file=config['data']['db_name']):
     conn = create_connection(db_file)
     cur = conn.cursor()
-    cur.execute(f'''SELECT * FROM content 
-                    LEFT JOIN image ON content.id = image.content_id 
-                    WHERE content.thread_id IS NULL 
-                    AND content.board = ? 
-                    ORDER BY created DESC 
+    cur.execute(f'''SELECT * FROM content c1
+                    LEFT JOIN image ON c1.id = image.content_id 
+                    WHERE c1.thread_id IS NULL 
+                    AND c1.board = ? 
+                    ORDER BY COALESCE(
+                        (SELECT MAX(c2.created) FROM content c2 WHERE c2.thread_id = c1.id AND c1.limited_at >= c2.created),
+                        c1.limited_at,
+                        (SELECT MAX(c2.created) FROM content c2 WHERE c2.thread_id = c1.id),
+                        c1.created) DESC
                     LIMIT ? OFFSET ?''', (f"/{path}/", limit, (page - 1) * 10))
     rows = cur.fetchall()
     conn.close()
     threads = []
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at,
         img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -384,7 +388,7 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
     rows = cur.fetchall()
     conn.close()
     for row in rows:
-        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies,
+        (id, created, board, thread_id, name, options, subject, comment, replies, image_replies, limited_at,
             img_id, img_created, content_id, filename, orig_filename, size, width, height, checksum, thread_id, version, url) = row
         img = Image(id=img_id,
                  content_id=content_id,
@@ -397,7 +401,7 @@ def select_thread(path, id, limit=100, db_file=config['data']['db_name']):
                  checksum=checksum,
                  version=version,
                  thread_id=thread_id)
-        quotes = select_quotes(id, limit=100)
+        quotes = select_quotes(id, limit=limit)
         return Content(id=id, 
                         board=board, 
                         thread_id=thread_id, 

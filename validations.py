@@ -27,11 +27,8 @@ def validate_file(data):
 
 def validate_comment(comment):
     messages = []
-    if not comment:
-        messages.append("comment is a required field")
-    else:
-        if len(comment) > 2000:
-            messages.append("comment is larger than 2000 character limit")
+    if len(comment) > 2000:
+        messages.append("comment is larger than 2000 character limit")
     return True if len(messages) == 0 else False, messages
 
 def validate_new_thread(name, subject, options, comment, data):
@@ -46,10 +43,8 @@ def validate_new_thread(name, subject, options, comment, data):
 def validate_new_reply(name, options, comment, data, path, thread):
     # TODO: length of name, subject, options
     if data.filename != 'empty':
-        print(path, thread)
         board = select_board(f"{path}", 1)
         content = select_thread(path, thread, limit=100)
-        print(content.image_replies, board)
 
         if content.image_replies < board.image_limit:
             valid_file, file_messages = validate_file(data)

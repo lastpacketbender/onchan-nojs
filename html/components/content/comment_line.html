@@ -40,7 +40,7 @@
             %end
         %elif segment in emotes:
             %replaced = segment.replace(':', '')
-            <img src="/public/emote/{{replaced}}.png" width="37" height="30">
+            <img src="/public/emote/{{replaced}}.png" class="emote">
         %elif segment[:3] == '>>>' and segment[-1] == '/':
             <a href="{{segment.replace('>', '')}}">{{segment}}</a>
         %elif segment[:2] == '>>' and segment[-1].isdigit():

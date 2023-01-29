@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import html, re, os, random, enum, hashlib, calendar, string, secrets
-from datetime import datetime
+import html, re, os, random, string, secrets
 
 from bottle import Bottle, route, static_file, template, error, abort, request, response, redirect, cookie_encode, cookie_decode
 from argon2 import PasswordHasher
@@ -228,10 +227,10 @@ def delete_from_board(path, page=1):
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/upload', method='POST')
 def upload(path):
-    name = request.forms.get('name')
-    subject = request.forms.get('subject')
-    options = request.forms.get('options')
-    comment = request.forms.get('comment')
+    name = request.forms.get('name').strip()
+    subject = request.forms.get('subject').strip()
+    options = request.forms.get('options').strip()
+    comment = request.forms.get('comment').strip()
     data = request.files.get("file", "")
     valid_thread, message = validate_new_thread(name, subject, options, comment, data)   
     if valid_thread:
@@ -282,9 +281,9 @@ def delete_from_thread(path, thread):
 
 @app.route('/<path:re:[a-z0-9]{1,3}>/thread/<thread:re:[0-9]+>/upload', method='POST')
 def upload_thread(path, thread):
-    name = request.forms.get('name')
-    options = request.forms.get('options')
-    comment = request.forms.get('comment')
+    name = request.forms.get('name').strip()
+    options = request.forms.get('options').strip()
+    comment = request.forms.get('comment').strip()
     data = request.files.get("file", "")
     valid_reply, message = validate_new_reply(name, options, comment, data, path, thread)
     if valid_reply:
@@ -393,29 +392,34 @@ def faq():
         page_title=get_title(extra='FAQ'))
     return template('html/index.html', ctx=ctx)
 
-print("Checking/applying DB migrations...")
-migrate()
+try:
+    print("Checking/applying DB migrations...")
+    migrate()
 
-# Configuration setup
-print("Reading configuration and setting up boards...")
-boards = select_boards()
-for board in config['boards']:
-    if not select_board(board['path'].replace('/', ''), 1):
-        print(f"Creating board {board['path']}")
-        b = Board(
-            board['path'], 
-            board['name'], 
-            board['description'], 
-            board['thread_limit'], 
-            board['image_limit'], 
-            board['bump_limit'])
-        insert_board(b)
+    # Configuration setup
+    print("Reading configuration and setting up boards...")
+    boards = select_boards()
+    for board in config['boards']:
+        if not select_board(board['path'].replace('/', ''), 1):
+            print(f"Creating board {board['path']}")
+            b = Board(
+                board['path'], 
+                board['name'], 
+                board['description'], 
+                board['thread_limit'], 
+                board['image_limit'], 
+                board['bump_limit'])
+            insert_board(b)
 
-t = BackgroundFilePurge()
-t.start()
-app.run(
-    host=config['server']['host'], 
-    port=config['server']['port'], 
-    debug=config['server']['debug'], 
-    reloader=config['server']['reload'])
-t.join()
+    # t = BackgroundFilePurge()
+    # t.start()
+    app.run(
+        server='paste',
+        host=config['server']['host'], 
+        port=config['server']['port'], 
+        debug=config['server']['debug'], 
+        reloader=config['server']['reload'])
+    # t.join()
+except:
+    # t.join()
+    print('Bye')

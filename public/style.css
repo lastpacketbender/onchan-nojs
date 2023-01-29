@@ -285,3 +285,8 @@ input {
 	overflow: hidden; 
 	text-overflow: ellipsis;
 }
+
+.emote {
+	width: 37;
+	height: 30;
+}

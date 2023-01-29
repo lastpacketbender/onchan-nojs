@@ -31,14 +31,14 @@
                     </tr>
                     <tr>
                         <th><label for="comment">Comment</label></th>
-                        <td><textarea required maxlength="2000" cols="30" rows="4" name="comment" id="comment" style="width: 100%"></textarea></td>
+                        <td><textarea maxlength="2000" cols="30" rows="4" name="comment" id="comment" style="width: 100%"></textarea></td>
                     </tr>
                     <tr>
                         <th><label for="file-upload">File</label></th>
                         %if not ctx.thread:
-                        <td><input type="file" id="file" name="file" required style="width: 100%"></td>
+                            <td><input type="file" id="file" name="file" required style="width: 100%"></td>
                         %else:
-                        <td><input type="file" id="file" name="file" style="width: 100%"></td>
+                            <td><input type="file" id="file" name="file" style="width: 100%"></td>
                         %end
                     </tr>
                 </table>

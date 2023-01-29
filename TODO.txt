@@ -1,6 +1,3 @@
-VIRTUALIZATION
-    - Create Dockerfile
-
 CLEAN UP
     - Remove unused CSS/style
     - HTML/CSS validation
@@ -37,6 +34,7 @@ DATA
     - Saging
     - Bump limit
     - Create ANSI SQL migrations for other DB/configuration
+    - Migrate to sProcs
 
 COSMETIC FIXES
     - Remove old "quote" notation from html
@@ -44,7 +42,6 @@ COSMETIC FIXES
 
 BUG FIXES
     - Strip submission
-    - Allow submission of only an image
 
 FEATURES
     - Add (Dead) for IDs no longer existing
@@ -55,7 +52,6 @@ FEATURES
     - DB
         - Bump limit
         - SQL meta tables and stats
-        - Indexes
         - Reporting
     - Options
         - sage (don't bump thread)
@@ -73,7 +69,7 @@ FEATURES
     - Reporting
 
 CONFIGURATION
-    - Boards (path, description, name, special rules)
+    - Boards
         - posting functionality (nonoko by default)
         - special rules
 
@@ -82,7 +78,6 @@ NICE TO HAVES
     - Incentivize breakage (pop all posts, injections, getting dubs, trips, etc.)
     - JS Additions
     - localstack for S3 replacement of public folder or CDN
-    - SQL for other non SQLite databases (for sharding)
     - Image DNA
     - Check for steganography
     - Watch words
