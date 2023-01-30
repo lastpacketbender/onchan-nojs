@@ -1,4 +1,4 @@
-%if ctx.thread and 'quote' not in vars():
+%if ctx.thread and 'reply' not in vars():
 <div style="display: inline-block">
     <input type="checkbox" name="{{ctx.thread.id}}" class="input-delete"/>
     <strong class="name">{{ctx.thread.name}}</strong>&nbsp;
@@ -10,8 +10,11 @@
     %if ctx.reply:
         [<a href="{{ctx.board.path}}thread/{{ctx.thread.id}}">Reply</a>]
     %end
+    %for quote in ctx.thread.quotes:
+        <a href="#p{{quote}}">&gt;&gt;{{quote}}</a>
+    %end
 </div>
-%elif 'quote' not in vars() and thread:
+%elif 'reply' not in vars() and thread:
 <div style="display: inline-block">
     <input type="checkbox" name="{{thread.id}}" class="input-delete"/>
     <strong class="name">{{thread.name}}</strong>&nbsp;
@@ -23,19 +26,28 @@
     %if ctx.reply:
         [<a href="{{ctx.board.path}}thread/{{thread.id}}">Reply</a>]
     %end
+    %for quote in thread.quotes:
+        <a href="#p{{quote}}">&gt;&gt;{{quote}}</a>
+    %end
 </div>
-%elif 'quote' in vars() and not ctx.thread:
+%elif 'reply' in vars() and not ctx.thread:
 <div style="display: inline-block">
-    <input type="checkbox" name="{{quote.id}}" class="input-delete"/>
-    <strong class="name">{{quote.name}}</strong>&nbsp;
-    <a href="{{ctx.board.path}}thread/{{thread.id}}#p{{quote.id}}">No.</a><a href="{{ctx.board.path}}thread/{{thread.id}}#q{{quote.id}}">{{quote.id}}</a>&nbsp;
-    <small>{{quote.created.strftime("%m/%d/%y(%a)%H:%M:%S")}}&nbsp;</small>
+    <input type="checkbox" name="{{reply.id}}" class="input-delete"/>
+    <strong class="name">{{reply.name}}</strong>&nbsp;
+    <a href="{{ctx.board.path}}thread/{{thread.id}}#p{{reply.id}}">No.</a><a href="{{ctx.board.path}}thread/{{thread.id}}#q{{reply.id}}">{{reply.id}}</a>&nbsp;
+    <small>{{reply.created.strftime("%m/%d/%y(%a)%H:%M:%S")}}&nbsp;</small>
+    %for quote in reply.quotes:
+        <a href="#p{{quote}}">&gt;&gt;{{quote}}</a>
+    %end
 </div>
-%elif 'quote' in vars() and ctx.thread:
+%elif 'reply' in vars() and ctx.thread:
 <div style="display: inline-block">
-    <input type="checkbox" name="{{quote.id}}" class="input-delete"/>
-    <strong class="name">{{quote.name}}</strong>&nbsp;
-    <a href="{{ctx.board.path}}thread/{{ctx.thread.id}}#p{{quote.id}}">No.</a><a href="{{ctx.board.path}}thread/{{ctx.thread.id}}#q{{quote.id}}">{{quote.id}}</a>&nbsp;
-    <small>{{quote.created.strftime("%m/%d/%y(%a)%H:%M:%S")}}&nbsp;</small>
+    <input type="checkbox" name="{{reply.id}}" class="input-delete"/>
+    <strong class="name">{{reply.name}}</strong>&nbsp;
+    <a href="{{ctx.board.path}}thread/{{ctx.thread.id}}#p{{reply.id}}">No.</a><a href="{{ctx.board.path}}thread/{{ctx.thread.id}}#q{{reply.id}}">{{reply.id}}</a>&nbsp;
+    <small>{{reply.created.strftime("%m/%d/%y(%a)%H:%M:%S")}}&nbsp;</small>
+    %for quote in reply.quotes:
+        <a href="#p{{quote}}">&gt;&gt;{{quote}}</a>
+    %end
 </div>
 %end

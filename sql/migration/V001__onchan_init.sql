@@ -107,6 +107,18 @@ CREATE TABLE IF NOT EXISTS image_removal_queue(
 	path TEXT PRIMARY KEY NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS quotes(
+	source_id INTEGER NOT NULL,
+	content_id INTEGER NOT NULL,
+	FOREIGN KEY(content_id) REFERENCES content(id)
+		ON DELETE CASCADE,
+	FOREIGN KEY(source_id) REFERENCES content(id)
+		ON DELETE CASCADE,
+	PRIMARY KEY(source_id, content_id)
+);
+
+CREATE INDEX idx_quotes_thread_id ON quotes(content_id);
+
 -- Maintain counts for replies
 CREATE TRIGGER IF NOT EXISTS increment_replies_trigger
    	AFTER INSERT ON content

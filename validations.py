@@ -70,7 +70,7 @@ def validate_new_reply(name, options, comment, data, path, thread):
         board = select_board(f"{path}", 1)
         content = select_thread(path, thread, limit=100)
 
-        if content.image_replies < board.image_limit:
+        if content.num_image_replies < board.image_limit:
             valid_file, file_messages = validate_file(data)
         else:
             valid_file, file_messages = False, ["Image limit reached"]

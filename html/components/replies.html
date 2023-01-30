@@ -1,16 +1,16 @@
 %if not ctx.thread:
-    %for quote in thread.quotes:
-    <div id="{{thread.id}}-{{quote.id}}" style="display: flex; margin: 10px;">
+    %for reply in thread.replies:
+    <div id="{{thread.id}}-{{reply.id}}" style="display: flex; margin: 10px;">
         &gt;&gt;&nbsp;
-        <div id="p{{quote.id}}" style="background-color: #f0e0d6; padding: 10px;" >
-            %if quote and quote.img and quote.img.url:
-            <a target="_blank" href="/{{quote.img.url}}">
-                <img src="/{{quote.img.url}}" class="thread-img"/>
+        <div id="p{{reply.id}}" style="background-color: #f0e0d6; padding: 10px;" >
+            %if reply and reply.img and reply.img.url:
+            <a target="_blank" href="/{{reply.img.url}}">
+                <img src="/{{reply.img.url}}" class="thread-img"/>
             </a>
             %end
-            <div id="{{quote.id}}-content" style="text-align: justify;">
+            <div id="{{reply.id}}-content" style="text-align: justify;">
                 %include(ctx.content_info)
-                %if quote and quote.img.url and quote.img.orig_filename:
+                %if reply and reply.img.url and reply.img.orig_filename:
                 %from util import convert_unit
                 %include(ctx.file_info)
                 %end
@@ -19,7 +19,7 @@
                     For now, make sure you update comment.html and catalog too
                 -->
                 <blockquote class="newlines" style="word-break: break-word;">
-                %for line in re.split("\r?\n", quote.comment):
+                %for line in re.split("\r?\n", reply.comment):
                     %include(ctx.comment_line)
                 %end
                 </blockquote>
@@ -29,18 +29,18 @@
     %end
 %else:
     %import re
-    %for quote in ctx.thread.quotes:
-    <div id="{{ctx.thread.id}}-{{quote.id}}" style="display: flex; margin: 10px;">
+    %for reply in ctx.thread.replies:
+    <div id="{{ctx.thread.id}}-{{reply.id}}" style="display: flex; margin: 10px;">
         &gt;&gt;&nbsp;
-        <div id="p{{quote.id}}" style="background-color: #f0e0d6; padding: 10px;" >
-            %if quote and quote.img and quote.img.url:
-            <a target="_blank" href="/{{quote.img.url}}">
-                <img src="/{{quote.img.url}}" class="thread-img"/>
+        <div id="p{{reply.id}}" style="background-color: #f0e0d6; padding: 10px;" >
+            %if reply and reply.img and reply.img.url:
+            <a target="_blank" href="/{{reply.img.url}}">
+                <img src="/{{reply.img.url}}" class="thread-img"/>
             </a>
             %end
-            <div id="{{quote.id}}-content" style="text-align: justify;">
+            <div id="{{reply.id}}-content" style="text-align: justify;">
                 %include(ctx.content_info)
-                %if quote and quote.img.url and quote.img.orig_filename:
+                %if reply and reply.img.url and reply.img.orig_filename:
                     %include(ctx.file_info)
                 %end
                 <!-- 
@@ -48,7 +48,7 @@
                     For now, make sure you update comment.html and catalog too
                 -->
                 <blockquote class="newlines" style="word-break: break-word;">
-                %for line in re.split("\r?\n", quote.comment):
+                %for line in re.split("\r?\n", reply.comment):
                     %include(ctx.comment_line)
                 %end
                 </blockquote>

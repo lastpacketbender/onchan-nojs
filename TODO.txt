@@ -10,7 +10,7 @@ DOCUMENTATION
 
 LOGGING
     - OWASP logging
-    - Role log file
+    - Roll log file
     - Configure log name/directory
 
 SECURITY
