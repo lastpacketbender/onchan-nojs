@@ -1,6 +1,31 @@
 # onchan-nojs
 
-`onchan` is a configurable base image-board implementation for those wanting to self-host or run their own.
+`onchan` is a configurable base image-board for those wanting to self-host or run their own. This is a mishmash of things I miss from imageboards of yesterday and features from 4chan X.
+
+## Features
+
+This is a bare-bones image board with some thing stolen from 4chan X (albeit without JavaScript - so no live updates). In the future I'll make connectors for CDN/infrastructure to host images and write ANSI SQL for DBs other than SQLite. 
+
+The goal was a very small instance that can be run on an inexpensive VPS with zero extra infrastructure. It's meant to be as disposable as it's content.
+
+* No CDN, S3, or special cloud services needed to host images. This implementation puts them in `public/img` and rolls them out when the thread expires. As long as you have enough storage for ~5MB * thread limit * image limit - you will be able to host without special infrastructure.
+* Cat emotes are there for those who know. `:k:` = head, `:o:` = body, `:t:` = trousers. Only use if you add lots of `:o:` on newlines. Long cat is long.
+* Post/image deletion works the same as 4chan. I store a cookie when you post that is is your password for deletion. If you clear cookies, you lose the ability to delete your posts.
+* Catalog view - display images and a short summary/reply counts in a more concise way.
+* Reply tracking - if a reply is quoted (`>>1` for example), it will show its references similar to 4chan X.
+* Greentext
+* Cross-board linking `>>>/b/` for example
+* Default posting functionality from a board is akin to old 4chan. (return to index after posting)
+* Using `nonoko` within an open thread's reply options will jump back to the index after replying
+* You may `sage` threads. The number of thread replies + `sage` will stop bumping the thread if it exceeds the bump limit defined in config for the board. Stop bumping low quality in half the time.
+* You may use nonoko in addition to sage with `nonokosage` to go back to the index from a thread.
+* I also allow you to `sage` your own thread on its initial post, just because. Throw it in options you masochist.
+
+## In progress
+
+* Trip codes
+* Secure trip codes
+* Capcodes
 
 ## Configuration
 
