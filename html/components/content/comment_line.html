@@ -46,9 +46,9 @@
         %elif segment[:2] == '>>' and segment[-1].isdigit():
             %replaced = segment.replace('>', '')
             %if ctx.thread:
-                <a href="{{ctx.board.path}}thread/{{replaced}}">{{segment}}{{" (OP)" if replaced == str(ctx.thread.id) else ""}}</a>
+                <a href="#p{{replaced}}">{{segment}}{{" (OP)" if replaced == str(ctx.thread.id) else ""}}</a>
             %else:
-                <a href="{{ctx.board.path}}thread/{{replaced}}">{{segment}}{{" (OP)" if replaced == str(thread.id) else ""}}</a>
+                <a href="#p{{replaced}}">{{segment}}{{" (OP)" if replaced == str(thread.id) else ""}}</a>
             %end
         %elif i == 0 and segment[0] == '>':
             <span class="greentext">{{segment}}</span>
