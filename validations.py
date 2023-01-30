@@ -31,20 +31,25 @@ def validate_options(options):
     valid_options = True
     if len(options) == 1 and options[0] != '':
         for option in options:
-            if option == "sage":
-                print("TODO: Bump sage, add to query")
-            elif option == "nonoko":
-                print("TODO: Old posting functionality")
+            if option == "sage" or option == "nonokosage" or option == "nonoko":
+                continue
             elif "##" in option:
                 name, password = option.split("##")
-                print("TODO: Secure trip code")
+                if len(name) > 0 and len(password) > 0:
+                    continue
+                else:
+                    messages.append(f"invalid secure trip code '{option}'")
+                    valid_options = False
             elif "#" in option:
                 name, password = option.split("#")
-                print("TODO: Trip code")
+                if len(name) > 0 and len(password) > 0:
+                    continue
+                else:
+                    messages.append(f"invalid trip code '{option}'")
+                    valid_options = False
             else:
                 messages.append(f"invalid option '{option}' found")
                 valid_options = False
-    print(options, valid_options)
     return valid_options, messages, options if len(messages) == 0 else None
 
 def validate_comment(comment):

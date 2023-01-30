@@ -34,10 +34,6 @@ DATA
     - Create ANSI SQL migrations for other DB/configuration
     - Migrate to sProcs
 
-COSMETIC FIXES
-    - Remove old "quote" notation from html
-    - Track replies to content for all types via >> in comments
-
 FEATURES
     - Add (Dead) for IDs no longer existing
     - GETs (MGET = Million)

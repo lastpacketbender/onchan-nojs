@@ -299,11 +299,13 @@ def upload_thread(path, thread):
             content_id, image_id, auth_id = save_comment_and_file(path, data, name, options, comment, password_hash, thread=thread)
         else:
             content_id, auth_id = save_comment(path, name, options, comment, thread=thread, password_hash=password_hash)
-        if "nonoko" in options:
-            print("TODO: nonoko in /thread/id/upload")
+        if "nonokosage" in options:
+            sage_thread(thread)
+            return redirect(f"/{path}/")
+        elif "nonoko" in options:
+            return redirect(f"/{path}/")
         elif "sage" in options:
             sage_thread(thread)
-            print("TODO: sage in /thread/id/upload")
         return redirect(f"/{path}/thread/{thread}")
     else:
         return your_bad(message)
